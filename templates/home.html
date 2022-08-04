@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+  </head>
+  <body>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">
+        <img class="thumbnail-image" src="{{ url_for('static', filename='drexel-university-logo-png-transparent.png') }}"> 
+      </a> 
+      <p class="ml-2">A Drexel University Senior Design Project</p>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <ul class="navbar-nav mr-sm-2">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://cci.drexel.edu/seniordesign/2021_2022/DIGITAL_PATHOLOGY_AND_EOSINOPHIL_DETECTION/index.html">Project Webpage</a>
+        </li>
+      </ul>
+    </nav>
+      
+    <img class="logo" src="{{ url_for('static', filename='dp_logo.png') }}"> 
+
+    <div class="row">
+      <form action="{{ url_for('server.server') }}" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset>
+          <h2 class="forDarkModeUse">Choose Files for Upload</h2>
+          <div class="col-12 form-group">
+              {{ form.email.label(class="form-control-label forDarkModeUse") }}
+              {% if form.email.errors %}
+                  {{ form.email(class="form-control is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                  </div>
+              {% else %}
+                  {{ form.email(class="form-control", id="exampleInputEmail1", placeholder="Enter email") }}
+              {% endif %}
+          </div>
+          <div class="col-12 form-group">
+            {{ form.file.label(class="form-control-label forDarkModeUse") }}
+            {% if form.file.errors %}
+              {{ form.file(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.file.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.file(class="form-control-file", id="file-uploader") }}
+            {% endif %}
+          </div>
+          <div id="feedback">
+    
+          </div>
+          
+          <label id="progress-label" for="progress"></label>
+          <progress id="progress" value="0" max="100"> </progress>
+        </fieldset>
+        <div class="form-group " >
+          {{ form.submit(class="btn btn-success") }}
+        </div>
+        {% if loadingbar %}
+          <div class="loadingbar">
+            <p> loading bar goes here!! </p>
+          </div>
+        {% endif %}
+        {% if content %}
+          <div class="model-content">
+            <p> model classification goes here!! </p>
+          </div>
+        {% endif %}
+      </form>
+    </div>
+    <button class="toggle" onclick="toggleBackground()">
+      Toggle Dark Mode
+    </button>
+    <script async src="{{ url_for('static', filename='home.js') }}"></script>
+    <script> 
+      function toggleBackground() {
+        var element = document.body;
+        element.classList.toggle('dark-mode');
+        var whiteText = document.getElementsByClassName("forDarkModeUse");
+        Array.from(whiteText).forEach(function (x) {
+          x.classList.toggle("white-text");
+        });
+    }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
