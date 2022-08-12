@@ -1,4 +1,4 @@
-function CreatePostTable(col) //generate inital state
+function CreatePostTable(col,list) //generate inital state
 {
   let board = document.getElementById("TrendingPostTable");
 
@@ -20,7 +20,7 @@ function CreatePostTable(col) //generate inital state
         th.className = 'PostListElement';
         let PostTableBtn = document.createElement("button")
         PostTableBtn.className = 'PostTableButton';
-        PostTableBtn.textContent = "Post Title";
+        PostTableBtn.textContent = list[c2-1];
         th.append(PostTableBtn);
       }
 
@@ -32,4 +32,5 @@ function CreatePostTable(col) //generate inital state
   board.append(tr);
 }
 
-CreatePostTable(10) //creates a table of 10 posts (Excluding head element or "TRENDING POSTS" block)
+const TrendingPosts = ["Post1","Post2","Post3","Post4","Post5","Post6","Post7","Post8","Post9","Post10"]
+CreatePostTable(TrendingPosts.length,TrendingPosts) //creates a table of 10 posts (Excluding head element or "TRENDING POSTS" block)
