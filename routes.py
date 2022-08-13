@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, url_for, redirect, request
 import asyncio
 from DocumentUploadForm import DocumentUploadForm
+from SignUpForm import SignUpForm
+from SignInForm import SignInForm
 from pprint import pprint
 from time import sleep
 import os
@@ -8,18 +10,77 @@ import json
 from threading import Thread
 
 backend = Blueprint('server', __name__)
-home = Blueprint('home', __name__)
+
+home = Blueprint('home', __name__, static_folder='static')
+signup = Blueprint('signup', __name__, static_folder='static')
+signin = Blueprint('signin', __name__, static_folder='static')
 
 ALLOWED_EXTENSIONS = {'tiff', 'svs', 'jpg', 'jpeg', 'png', 'JPG', 'JPEG', 'PNG'}
 
 def allowed_file(File):
     return '.' in File.filename and File.filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@home.route('/')
-@home.route('/home')
+
+########################################################################
+#                           SIGN IN PAGE
+########################################################################
+@signin.route('/', methods=['GET', 'POST'])
+@signin.route('/signin', methods=['GET', 'POST'])
+def sign_in_page():
+    form = SignInForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            print()
+            print("CHECKING THE DATABASE FOR THE USER DATA")
+            print("...")
+            print("REDIRECT TO THE HOME PAGE")
+            print()
+            return redirect(url_for("home.home_page"))
+    return render_template("SignIn.html", form=form)
+########################################################################
+#                         END SIGN IN PAGE
+########################################################################
+
+
+########################################################################
+#                           SIGN UP PAGE
+########################################################################
+@signup.route('/signup', methods=['GET', 'POST'])
+def sign_up_page():
+    form = SignUpForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            print()
+            print("CHECKING THE DATABASE FOR THE USER DATA")
+            print("...")
+            print("ADDING USER TO THE DATABASE")
+            print("...")
+            print("REDIRECT TO THE SIGN IN PAGE")
+            print()
+            return redirect(url_for("signup.sign_in_page"))
+    return render_template("SignUp.html", form=form)
+########################################################################
+#                         END SIGN UP PAGE
+########################################################################
+
+
+########################################################################
+#                           HOME PAGE
+########################################################################
+@home.route('/home', methods=['GET', 'POST'])
 def home_page():
-    form = DocumentUploadForm()
-    return render_template("home.html", form=form, loadingbar=False)
+    return render_template("Home.html")
+########################################################################
+#                         END HOME PAGE
+########################################################################
+
+
+
+# @home.route('/')
+# @home.route('/home')
+# def home_page():
+#     form = DocumentUploadForm()
+#     return render_template("home.html", form=form, loadingbar=False)
 
 @backend.route('/server', methods=['GET', 'POST'])
 def server():
