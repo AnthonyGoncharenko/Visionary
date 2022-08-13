@@ -1,18 +1,26 @@
-from flask import Flask
+from flask import Flask, g
 from flask_wtf.csrf import CSRFProtect
-from routes import backend, home, signup, signin
+from routes import home, signup, signin, logout
 import os
+from database import Database
+from models import User
+from flask_sqlalchemy import SQLAlchemy
 
 SECRET_KEY = os.urandom(32)
-
 csrf = CSRFProtect()
-
 app = Flask(__name__, static_url_path="/static")
 app.config['SECRET_KEY'] = SECRET_KEY
-app.register_blueprint(backend)
+
 app.register_blueprint(home)
 app.register_blueprint(signup)
 app.register_blueprint(signin)
+app.register_blueprint(logout)
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 csrf.init_app(app)
 

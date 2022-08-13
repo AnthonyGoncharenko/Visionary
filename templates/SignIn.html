@@ -1,3 +1,5 @@
+{% from 'form_helper.html' import displayField %}
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -16,18 +18,18 @@
   </div>
   <div id="SignIn" class="SignInStyle">
     <h1 class="SignInheader">Sign In</h1>
-    {% for field, errors in form.errors.items() %} {{ ', '.join(errors) }} {%
-    endfor %}
+    {% if error_messages %} 
+      {% for message in error_messages %}
+        <h2>{{ message }}</h2>
+      {% endfor %}
+    {% endif %}
     <form id="SignIn" class="SignIn" method="POST" action="">
       {{ form.csrf_token() }}
-      <div class="FormText">
-        {{ form.username.label }} {{ form.username(class="FormInputText",
-        placeholder="Username") }}
-      </div>
-      <div class="FormText">
-        {{ form.password.label }} {{ form.password(class="FormInputText",
-        placeholder="Password") }}
-      </div>
+
+      {{ displayField(form.username, 'Username', autocomplete="off", autofocus=true) }}
+      
+      {{ displayField(form.password, 'Password') }}
+      
       <div class="form-group">{{ form.submit(class="SubmitButton")}}</div>
     </form>
 

@@ -1,3 +1,5 @@
+{% from 'form_helper.html' import displayField %}
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -16,28 +18,18 @@
   </div>
   <div id="SignUp" class="SignUpStyle">
     <h1 class="SignUpheader">Sign Up</h1>
-    {% for field, errors in form.errors.items() %} {{ ', '.join(errors) }} {%
-    endfor %}
+    {% if error_messages %} {% for message in error_messages %}
+    <h2>{{ message }}</h2>
+    {% endfor %} {% endif %}
     <form id="SignUp" class="SignUp" method="POST" action="">
-      {{ form.csrf_token() }}
-      <div class="FormText">
-        {{ form.username.label }} {{ form.username(class="FormInputText",
-        placeholder="Username") }}
-      </div>
-      <div class="FormText">
-        {{ form.email.label }} {{ form.email(class="FormInputText",
-        placeholder="Email") }}
-      </div>
-      <div class="FormText">
-        {{ form.password.label }} {{ form.password(class="FormInputText",
-        placeholder="Password") }}
-      </div>
-      <div class="FormText">
-        {{ form.confirm_password.label }} {{
-        form.confirm_password(class="FormInputText", placeholder="Confirm
-        Password") }}
-      </div>
+      {{ displayField(form.username, 'Username', autocomplete="off",
+      autofocus=true) }} {{ displayField(form.email, 'Email') }} {{
+      displayField(form.password, 'Password') }} {{
+      displayField(form.confirm_password, 'Confirm Password') }}
+
       <div class="form-group">{{ form.submit(class="SubmitButton")}}</div>
+
+      {{ form.csrf_token }}
     </form>
 
     <div class="PostTableDiv" style="width: 30%">

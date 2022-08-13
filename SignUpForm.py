@@ -4,11 +4,10 @@ from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import (DataRequired, Email, EqualTo, Length,
                                 ValidationError)
 
-
 class SignUpForm(FlaskForm):
     username = StringField(label=('Username'), 
         validators=[DataRequired(), 
-        Length(min=6,max=64)]) 
+        Length(min=6,max=25)]) 
     email = StringField(label=('Email'), 
         validators=[DataRequired(), 
         Email(), 
@@ -22,3 +21,18 @@ class SignUpForm(FlaskForm):
         EqualTo('password', message='Both password fields must be equal!')])
 
     submit = SubmitField(label=('Submit'))
+
+    def validate_username(self, username):
+        print()
+        print("CHECKING CORRECTNESS OF USERNAME...")
+        print()
+
+        excluded_chars = set(" *?!'^+%&/()=}][{$#")
+        for char in self.username.data:
+            if char in excluded_chars:
+                raise ValidationError(f"Character {char} is not allowed in username.")
+
+        
+
+
+
