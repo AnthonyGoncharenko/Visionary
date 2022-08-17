@@ -1,324 +1,73 @@
-
-  .Main-Header {
-    color: #2c2d30;
-
-  }
-
-  .button-group {
-    height: 40px;
-    background-color: #234995;
-    width: 100%;
-    /* For browsers that do not support gradients */
-    background-image: linear-gradient(to right, #234995, #acadaf);
-    border: 1px solid blue;
-
-  }
-
-
-  .MakePostButton {
-    color: white;
-    height: 40px;
-    background-color: #234995;
-    border: 1px solid #234995;
-  }
-
-  .MakePostButton:hover {
-    background-color: #172f5e;
-  }
-
-  .AuthorsButton {
-    color: white;
-    height: 40px;
-    background-color: #4a87b5;
-    border: 1px solid #234995;
-  }
-
-  .AuthorsButton:hover {
-    background-color: #3d6785;
-  }
-
-  .SignInButton {
-    float: right;
-    color: white;
-    height: 40px;
-    background-color: #0071c2;
-    border: 1px solid #234995;
-  }
-
-  .SignInButton:hover {
-    background-color: #006bb8;
-  }
-
-  body {
-    background-color: #7497dc;
-    /* For browsers that do not support gradients */
-    background-image: linear-gradient(to right, #7497dc, #ebebeb);
-  }
-
-  
-   /*///////////////////////////////////////////////////////////////////////////////////////////////// */
-  /*Post Table element to the right of page */
-  .PostTableDiv {
-    
-    position: absolute;
-    right: 5%;
-    top: 15%;
-    width: 30%; 
-      max-width:100%;
-    max-height: 750px;
-    width: auto;
-    height: auto;
-
-    background-color: #234995;
-    /* For browsers that do not support gradients */
-    background-image: linear-gradient(to right, #234995, #acadaf);
-
-  }
-
-  .PostTable {
-     width:100%
-      
-  }
-
-  .PostListHead {
-    text-align: center;
-    color: white;
-    font-size: 30px;
-    border: 1px solid #dbdbdb;
-  }
-
-  .PostListElement {
-    text-align: center;
-    color: #dbdbdb;
-    font-size: 30px;
-    border: 1px solid #dbdbdb;
-  }
-
-  .PostTableButton {
-    color: white;
-    height: 40px;
-   
-    background-color: #234995;
-    border: 1px solid #dbdbdb;
-    width: 100%;
-  }
-
-  .PostTableButton:hover {
-    background-color: #172f5e;
-  }
-
-  /*///////////////////////////////////////////////////////////////////////////////////////////////// */
-
-  /*Unique to home page Blog/post title element */
-  .Post {
-    width: 60%
-  }
-
-  .PostStyle {
-    background-color: #234995;
-    /* For browsers that do not support gradients */
-    background-image: linear-gradient(to right, #234995, #acadaf);
-
-  }
-
-  .Postheader {
-    text-align: center;
-    color: white;
-  }
-
-  .PostImage {
-    display: block;
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-
-    /*center image */
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .PostText {
-    text-align: center;
-    color: white;
-  }
-
-   /*///////////////////////////////////////////////////////////////////////////////////////////////// */
-  
-  /*Styles for Make A post */
-
-  .MakePost {
-    width: 60%
-  }
-
-  .MakePostStyle {
-    background-color: #234995;
-    /* For browsers that do not support gradients */
-    background-image: linear-gradient(to right, #234995, #acadaf);
-
-  }
-
-  .MakePostheader {
-    text-align: center;
-    color: white;
-  }
-
-  .title {
-    width: 100%;
-    padding: 5px 5px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-
-  .FormText {
-    color: white;
-  }
-
-  .LoginButton {
-    background-color: #595959;
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-  }
-
-  .LoginButton:hover {
-    background-color: #2e2e2e;
-  }
-
-  .PostContent {
-    width: 100%;
-  }
-
-  .description{
-
-  display:flex;
-  flex-direction:column;
-
-  font-size: 25px;
-  padding: 10px;
+body {
+    font-family: 'Ubuntu', sans-serif;
 }
 
-.descriptionbox{
-  border: 2px groove black;
-  width: 500px;
-  height: 300px;
-  font-size: 20px;
+.home-tab {
+    background-color: crimson;
 }
 
+.post-tab {
+    background-color: magenta;
+}
 
-.wordc{
-  font-size: 20px;
-  position: relative;
-  bottom: 25px;
-  left: 480px;
-}  
+.author-tab {
+    background-color: orange;
+}
 
-  .display_image {
-    /*needs to be changed to be dyanmic size */
-    width: 500px;
-    height: 500px;
-    border: 1px solid black;
+.login-tab {
+    background-color: greenyellow;
+}
 
-    background-position: center;
+.signup-tab {
+    background-color: yellow;
+}
 
-    background-size: cover;
-    background-image: url("https://i.pinimg.com/originals/61/54/18/61541805b3069740ecd60d483741e5bb.jpg");
-  }
-
- /*///////////////////////////////////////////////////////////////////////////////////////////////// */
-/*Styles for Sign up */
-
-
-  .FormInputText {
-    width: 100%;
-    padding: 5px 5px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-
-  .FormText {
+.home-tab .active{
+    background-color: darkred;
     color: white;
-  }
+    font-weight: bolder;
+}
 
-  .SubmitButton {
-    background-color: #595959;
+.post-tab .active{
+    background-color: darkmagenta;
     color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-  }
+    font-weight: bolder;
+}
 
-  .SubmitButton:hover {
-    background-color: #2e2e2e;
-  }
-
-  .SignUp {
-    width: 60%
-  }
-
-  .SignUpStyle {
-    background-color: #234995;
-    /* For browsers that do not support gradients */
-    background-image: linear-gradient(to right, #234995, #acadaf);
-
-  }
-
-  .SignUpheader {
-    text-align: center;
+.author-tab .active{
+    background-color: chocolate;
     color: white;
-  }
+    font-weight: bolder;
+}
 
-
- /*///////////////////////////////////////////////////////////////////////////////////////////////// */
-/*Styles for Sign in */
-
-  .LoginButton{
-    background-color: #595959;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  }
-
-  .LoginButton:hover {
-    background-color: #2e2e2e;
-  }
-
-  .SignIn {
-    width: 60%
-  }
-
-  .SignInStyle {
-    background-color: #234995;
-    /* For browsers that do not support gradients */
-    background-image: linear-gradient(to right, #234995, #acadaf);
-
-  }
-
-  .SignInheader {
-    text-align: center;
+.login-tab .active{
+    background-color: mediumseagreen;
     color: white;
-  }
-  .CheckBox
-  {
-   color: white;
-  }
+    font-weight: bolder;
+}
 
-/*///////////////////////////////////////////////////////////////////////////////////////////////// */
-/*Styles for post Page */
+.signup-tab .active{
+    background-color: darkgoldenrod;
+    color: white;
+    font-weight: bolder;
+}
 
+.primary-nav-bar {
+    background-color: darkslateblue;
+}
 
-/*///////////////////////////////////////////////////////////////////////////////////////////////// */
-/*Styles for post preview Page */
+.montserrat {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.branding-header {
+    background-image: linear-gradient(90deg, gold, white);
+}
+
+.crimson-background {
+    background-image: linear-gradient(0deg, red, white);
+}
+
+.blog-backing {
+    background-color: palevioletred;
+}
