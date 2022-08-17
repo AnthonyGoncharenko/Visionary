@@ -11,7 +11,27 @@
 
 
 <body>
-  {{ navbar(0) }}
+  <header class="py-3 border-bottom border-5 border-dark branding-header">
+    <div class="container-fluid d-flex flex-wrap justify-content-center">
+      <a href="/" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
+        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
+        <span class="fs-1 montserrat">Visionary</span>
+      </a>
+    </div>
+  </header>
+  <nav class="border-bottom border-bottom border-5 border-dark primary-nav-bar">
+    <div class="container-fluid d-flex flex-wrap p-0">
+      <ul class="nav me-auto">
+        <li class="nav-link border-end border-5 border-dark home-tab"><a href="#" class="nav-link link-dark px-2">See What's Hot</a></li>
+        <li class="nav-link border-end border-5 border-dark post-tab"><a href="#" class="nav-link link-dark px-2">Make a Post</a></li>
+        <li class="nav-link border-end border-5 border-dark author-tab" ><a href="#" class="nav-link link-dark px-2">Find Authors</a></li>
+      </ul>
+      <ul class="nav">
+        <li class="nav-link border-start border-5 border-dark login-tab"><a href="#" class="nav-link link-dark px-2">Login</a></li>
+        <li class="nav-link border-start border-5 border-dark signup-tab"><a href="#" class="nav-link link-dark px-2">Sign up</a></li>
+      </ul>
+    </div>
+  </nav>
   <div class="container-fluid p-0">
     <div class="row">
       <div class="col-8 p-0">
@@ -29,16 +49,15 @@
       </div>
       
       <div class="col-4 p-0">
-        <div class="d-flex flex-column align-items-stretch flex-shrink-0">
-          <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-            <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"/></svg>
-            <span class="fs-5 fw-semibold">Trending Posts</span>
+        <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
+          <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, orange, chocolate);">
+            <span class="fs-5 fw-semibold montserrat" style="color: white">Trending Posts</span>
           </a>
-          <div class="list-group list-group-flush border-bottom">
-            <a href="#" class="list-group-item list-group-item-action active py-3" aria-current="true">
+          <div class="list-group list-group-flush border-bottom border-dark border-3">
+            <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
               <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1">Post Title</strong>
-                <small>Post Date?</small>
+                <small class>Post Date?</small>
               </div>
               <div class="col-10 mb-1 small">Post Preview?</div>
             </a>
