@@ -1,0 +1,23 @@
+{% macro navbar(active)}
+    <header class="py-3 border-bottom border-5 border-dark branding-header">
+    <div class="container-fluid d-flex flex-wrap justify-content-center">
+      <a href="/" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
+        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
+        <span class="fs-1 montserrat">Visionary</span>
+      </a>
+    </div>
+  </header>
+  <nav class="border-bottom border-bottom border-5 border-dark primary-nav-bar">
+    <div class="container-fluid d-flex flex-wrap p-0">
+      <ul class="nav me-auto">
+        <li class="nav-link border-end border-5 border-dark home-tab {{'active' if active == 0 }}"><a href="#" class="nav-link link-dark px-2">See What's Hot</a></li>
+        <li class="nav-link border-end border-5 border-dark post-tab {{'active' if active == 1 }}"><a href="#" class="nav-link link-dark px-2">Make a Post</a></li>
+        <li class="nav-link border-end border-5 border-dark author-tab {{'active' if active == 2 }}" ><a href="#" class="nav-link link-dark px-2">Find Authors</a></li>
+      </ul>
+      <ul class="nav">
+        <li class="nav-link border-start border-5 border-dark login-tab {{'active' if active == 3 }}"><a href="#" class="nav-link link-dark px-2">Login</a></li>
+        <li class="nav-link border-start border-5 border-dark signup-tab {{'active' if active == 4 }}"><a href="#" class="nav-link link-dark px-2">Sign up</a></li>
+      </ul>
+    </div>
+  </nav>
+{%- endmacro %}
