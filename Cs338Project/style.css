@@ -1,3 +1,73 @@
 body {
     font-family: 'Ubuntu', sans-serif;
 }
+
+.home-tab {
+    background-color: crimson;
+}
+
+.post-tab {
+    background-color: magenta;
+}
+
+.author-tab {
+    background-color: orange;
+}
+
+.login-tab {
+    background-color: greenyellow;
+}
+
+.signup-tab {
+    background-color: yellow;
+}
+
+.home-tab .active{
+    background-color: darkred;
+    color: white;
+    font-weight: bolder;
+}
+
+.post-tab .active{
+    background-color: darkmagenta;
+    color: white;
+    font-weight: bolder;
+}
+
+.author-tab .active{
+    background-color: chocolate;
+    color: white;
+    font-weight: bolder;
+}
+
+.login-tab .active{
+    background-color: mediumseagreen;
+    color: white;
+    font-weight: bolder;
+}
+
+.signup-tab .active{
+    background-color: darkgoldenrod;
+    color: white;
+    font-weight: bolder;
+}
+
+.primary-nav-bar {
+    background-color: darkslateblue;
+}
+
+.montserrat {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.branding-header {
+    background-image: linear-gradient(90deg, gold, white);
+}
+
+.crimson-background {
+    background-image: linear-gradient(0deg, red, white);
+}
+
+.blog-backing {
+    background-color: palevioletred;
+}
