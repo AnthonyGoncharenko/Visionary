@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="Main-header">
+      <h1>Visionary</h1>
+    </header>
+    <div class="button-group" style="width: 100%">
+      <button class="MakePostButton" style="width: 20%">Make a post</button>
+      <button class="AuthorsButton" style="width: 20%">Find Authors</button>
+      <button class="SignInButton" style="width: 20%">Sign-in</button>
+    </div>
+
+    <form id="makePost" class="MakePost">
+      <!-- may want to add action here like action = "/action_page.php" -->
+      <div class="MakePostStyle">
+        <h1 class="MakePostheader">Make A Post</h1>
+        <!--make a post -->
+
+        <div class="container">
+          <!-- Post title-->
+          <label for="uname" class="FormText"><b>Post Title</b></label>
+          <input
+            id="PostTitle"
+            class="title"
+            placeholder="Enter Title"
+            name="uname"
+            required
+          />
+
+          <label for="psw" class="FormText"><b>Post Content</b></label>
+          <!-- description box-->
+          <div class="description">
+            <textarea
+              id="description1"
+              class="descriptionbox"
+              name="uploadDescription"
+              placeholder="Enter description of item..."
+            ></textarea>
+            <div class="wordc" id="wordcount">0</div>
+          </div>
+
+          <div class="display_image_pos">
+            <!-- display image -->
+            <p class="FormText">Select Image Content</p>
+            <input
+              type="file"
+              id="image_input"
+              name="uploadImage"
+              accept="image/png,image/jpg"
+            />
+
+            <div class="display_image" id="display_image"></div>
+          </div>
+
+          <!-- Submit button -->
+          <button class="LoginButton" type="submit" onclick="SubmitPostFunc()">
+            Submit
+          </button>
+
+          <!-- Remeber me -->
+          <label>
+            <input type="checkbox" checked="checked" name="remember" /> Remember
+            me
+          </label>
+        </div>
+      </div>
+    </form>
+
+    <!-- TrendingPost table-->
+    <div class="PostTableDiv" style="width: 30%">
+      <table align="center" class="PostTable" id="TrendingPostTable"></table>
+    </div>
+
+    <script src="TrendingPosts.js"></script>
+    <script src="MakePost.js"></script>
+  </body>
+</html>
