@@ -23,16 +23,9 @@ class SignUpForm(FlaskForm):
     submit = SubmitField(label=('Submit'))
 
     def validate_username(self, username):
-        print()
         print("CHECKING CORRECTNESS OF USERNAME...")
-        print()
 
         excluded_chars = set(" *?!'^+%&/()=}][{$#")
         for char in self.username.data:
             if char in excluded_chars:
                 raise ValidationError(f"Character {char} is not allowed in username.")
-
-        
-
-
-
