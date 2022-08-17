@@ -1,0 +1,43 @@
+{% from 'form_helper.html' import displayField %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <header class="Main-header">
+    <h1>Visionary</h1>
+  </header>
+  <div class="button-group" style="width: 100%">
+    <button class="MakePostButton" style="width: 20%">Make a post</button>
+    <button class="AuthorsButton" style="width: 20%">Find Authors</button>
+    <button class="SignInButton" style="width: 20%">Sign-in</button>
+  </div>
+  <div id="SignUp" class="SignUpStyle">
+    <h1 class="SignUpheader">Sign Up</h1>
+    {% if error_messages %} {% for message in error_messages %}
+    <h2>{{ message }}</h2>
+    {% endfor %} {% endif %}
+    <form id="SignUp" class="SignUp" method="POST" action="">
+      {{ displayField(form.username, 'Username', autocomplete="off",
+      autofocus=true) }} {{ displayField(form.email, 'Email') }} {{
+      displayField(form.password, 'Password') }} {{
+      displayField(form.confirm_password, 'Confirm Password') }}
+
+      <div class="form-group">{{ form.submit(class="SubmitButton")}}</div>
+
+      {{ form.csrf_token }}
+    </form>
+
+    <div class="PostTableDiv" style="width: 30%">
+      <table
+        style="margin-left: auto; margin-right: auto"
+        class="PostTable"
+        id="TrendingPostTable"
+      ></table>
+    </div>
+  </div>
+</html>
