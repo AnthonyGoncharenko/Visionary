@@ -1,44 +1,18 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
-  </head>
-
-  <body>
-    <header class="Main-header">
-      <h1>Visionary</h1>
-    </header>
-    <div class="button-group">
-      <button class="MakePostButton" style="width: 20%">Make a post</button>
-      <button class="AuthorsButton" style="width: 20%">Find Authors</button>
-      <button class="SignInButton" style="width: 20%">Sign-in</button>
+{% extends "base.html" %}
+{% from 'macros/common_elements.jinja' import postfeed, postRail %}
+{% block title %}
+  What's Hot
+{% endblock title %}
+{% set activePage = 0 %}
+<head>
+  <script src="HomePage.js"></script>
+  <script src="TrendingPosts.js"></script>
+</head>
+{% block content %}
+  <div class="container-fluid p-0">
+    <div class="row">
+      {{ postfeed() }}
+      {{ postRail() }}
     </div>
-
-    <div class="Post">
-      <div class="PostStyle">
-        <h1 id="PostHeader"></h1>
-        <!-- Handles Header of Post on home-->
-        <img id="PostImage" />
-        <!-- Handles Image of Post on home-->
-        <p id="PostText">
-          <!-- Handles bottom text of Post-->
-        </p>
-      </div>
-    </div>
-
-    <!-- TrendingPost table-->
-    <div class="PostTableDiv" style="width: 30%">
-      <table
-        style="margin-left: auto; margin-right: auto"
-        class="PostTable"
-        id="TrendingPostTable"
-      ></table>
-    </div>
-
-    <script src="HomePage.js"></script>
-    <script src="TrendingPosts.js"></script>
-  </body>
-</html>
+  </div>
+{% endblock content %}

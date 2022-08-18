@@ -1,19 +1,9 @@
-import asyncio
-import json
-import os
-from pprint import pprint
-from threading import Thread
-from time import sleep
-
-from flask import Blueprint, g, redirect, render_template, request, url_for, session
+from flask import (Blueprint, g, redirect, render_template, request, session, url_for)
 from passlib.hash import pbkdf2_sha256
 
 from database import Database
-from DocumentUploadForm import DocumentUploadForm
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
-
-# backend = Blueprint('server', __name__)
 
 home = Blueprint('home', __name__, static_folder='static')
 signup = Blueprint('signup', __name__, static_folder='static')
@@ -104,9 +94,13 @@ def sign_up_page():
 @home.route('/home', methods=['GET', 'POST'])
 def home_page():
     if 'user' in session:
-        return render_template("Home.html", trending_posts=trending_posts(), recent_posts=recent_posts())
+        return render_template("Home.html", session=session, 
+        followed_posts=followed_posts(), 
+        trending_posts=trending_posts(), 
+        recent_posts=recent_posts())
     else:
-        return redirect(url_for('signin.sign_in_page'))
+        return render_template("Home.html", trending_posts=trending_posts(), recent_posts=recent_posts())
+        
 ########################################################################
 #                         END HOME PAGE
 ########################################################################
@@ -130,6 +124,7 @@ def post_to_dict(post):
     m['author'] = post['author']
     m['title'] = post['title']
     m['data'] = post['data']
+    return m
 
 def trending_posts():
     """
