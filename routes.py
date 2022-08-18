@@ -104,7 +104,7 @@ def sign_up_page():
 @home.route('/home', methods=['GET', 'POST'])
 def home_page():
     if 'user' in session:
-        return render_template("Home.html")
+        return render_template("Home.html", trending_posts=trending_posts(), recent_posts=recent_posts())
     else:
         return redirect(url_for('signin.sign_in_page'))
 ########################################################################
@@ -124,7 +124,36 @@ def logout_page():
 #                         END LOG OUT
 ########################################################################
 
+def post_to_dict(post):
+    m = {}
+    m['pid'] = post['pid']
+    m['author'] = post['author']
+    m['title'] = post['title']
+    m['data'] = post['data']
 
+def trending_posts():
+    """
+    trending_posts Get top 10 posts from the database, and return them in a list
+    """
+    posts = get_db().get_n_trending_posts(n)
+    return [ post_to_dict(post) for post in posts ]
+    
+def recent_posts():
+    """
+    recent_posts Get 10 most recent posts from the database, and return them in a list
+    """
+    posts = get_db().get_n_recent_posts(n)
+    return [ post_to_dict(post) for post in posts ]
+
+def followed_posts():
+    if 'user' in session:
+        posts = get_db().get_n_followed_posts(session['user'], 10)
+        return [ post_to_dict(post) for post in posts ]
+    return []
+
+def delete_post():
+    #TODO
+    return
 
 # @home.route('/')
 # @home.route('/home')

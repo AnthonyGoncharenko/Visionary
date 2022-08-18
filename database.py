@@ -1,5 +1,17 @@
 import sqlite3
 import os
+
+def post_to_dict(post):
+    m = {}
+    m["pid"] = post[0]
+    m["uid"] = post[1]
+    m["title"] = post[2]
+    m["content"] = post[3]
+    m["imid"] = post[4]
+    m["clicks"] = post[5]
+    m["date"] = post[6]
+    return m
+
 class Database:
     def __init__(self, database_name):
         if not os.path.exists(database_name):
@@ -18,10 +30,12 @@ class Database:
         c = self.conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS users 
         (
-            uid SERIAL PRIMARY KEY,
+            uid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             username VARCHAR(25) UNIQUE NOT NULL, 
             password TEXT NOT NULL,
-            email VARCHAR(120) NOT NULL
+            email VARCHAR(120) NOT NULL,
+            followed INTEGER[],
+            posts INTEGER[]
          );''')
         self.conn.commit()
         ###############################################
@@ -34,11 +48,13 @@ class Database:
         c = self.conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS posts 
         (
-            pid SERIAL PRIMARY KEY, 
+            pid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
             uid INTEGER NOT NULL,
             title TEXT NOT NULL,
             content TEXT NOT NULL,
             imid INTEGER,
+            clicks INTEGER,
+            date DATE,
             FOREIGN KEY(uid) REFERENCES users(uid),
             FOREIGN KEY(imid) REFERENCES images(imid)
         );''')
@@ -53,7 +69,7 @@ class Database:
         c = self.conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS images 
         (
-            imid SERIAL PRIMARY KEY,
+            imid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             uid INTEGER NOT NULL,
             img VARBINARY(8000) NOT NULL,
             FOREIGN KEY(uid) REFERENCES users(uid)
@@ -86,6 +102,8 @@ class Database:
             'username': d[1],
             'encrypted_password': d[2],
             'email': d[3],
+            'followed': d[4],
+            'posts' : d[5],
             }
 
     def create_post(self, username, title, content, img):
@@ -101,5 +119,46 @@ class Database:
     def __get_img_id(self, uid, img):
         return self.__select('SELECT FROM images WHERE uid=? AND img=?', [uid, img])
 
+    def get_posts_ids_by_author(self, author):
+        data = self.__select('SELECT posts FROM users WHERE username=?', [author])
+        if data:
+            return {
+                'pids' : data[0]
+            }
+
+    def get_posts_from_author(self, author):
+        if (post_ids := self.get_posts_ids_by_author(author)) is None:
+            return
+        res = []
+        for pid in post_ids:
+            post = self.__select('SELECT * FROM posts where pid=?', [pid])[0]
+            res.append(post_to_dict(post))
+        return { 
+            'posts' : res
+         }
+    def get_n_trending_posts(self, n: int):
+        data = self.__select('SELECT TOP ? FROM posts SORT BY clicks', [n])
+
+        return {
+            'posts' : [post_to_dict(post) for post in data]
+        }
+
+    def get_n_recent_posts(self, n: int):
+        data = self.__select('SELECT TOP ? FROM posts ORDER BY DATE DESC', [n])
+
+        return {
+            'posts' : [post_to_dict(post) for post in data]
+        }
+
+    def get_n_followed_posts(self, username, n):
+        data = self.__select("""SELECT TOP ? 
+                                FROM posts, ( SELECT followed FROM users where username=? ) 
+                                WHERE posts.pid = followed 
+                                ORDER BY posts.DATE""", [n, username])
+        
+        return {
+            'posts' : [post_to_dict(post) for post in data]
+        }
     def close(self):
         self.conn.close()
+
