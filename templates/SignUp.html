@@ -1,26 +1,42 @@
-{% from "macros/form_helper.html" import displayField %}
+{% from "form_helper.html" import displayField %}
+{% from 'macros/common_elements.jinja' import postfeed, postRail %}
 {% extends "base.html" %}
 {% block title %}
   SignUp
 {% endblock title %}
+{% set activePage = 4 %}
 {% block head %}
   {{ super() }}
 {% endblock head %}
 {% block content %}
-  <h1 class="signupheader">Sign Up</h1>
-  {% if error_messages %}
-    {% for message in error_messages %}<h2>{{ message }}</h2>{% endfor %}
-  {% endif %}
-  <form id="signup" class="signup" method="post" action="">
-    {{ displayField(form.username, 'Username', autocomplete="off",
-    autofocus=true) }} {{ displayField(form.email, 'Email') }}
-    {{ displayField(form.password, 'Password') }}
-    {{ displayField(form.confirm_password, 'Confirm Password') }}
-    <div class="form-group">{{ form.submit(class="submitbutton") }}</div>
-    {{ form.csrf_token }}
-  </form>
-  <div class="posttablediv">
-    <table class="posttable" id="TrendingPostTable">
-    </table>
+  <div class="row m-0 h-100">
+    <div class="col-8 p-0 gold-background mb-auto h-100">
+      <div class="p-5 overflow-auto container-fluid scrollarea">
+        <h1 class="signupheader">Sign Up</h1>
+        {% if error_messages %}
+          {% for message in error_messages %}<h2>{{ message }}</h2>{% endfor %}
+        {% endif %}
+        <div class="col-5 border rounded flex-md-row shadow-sm border-dark"
+             style="border-color: darkgoldenrod!important;
+                    background-color: palegoldenrod;">
+          <form class="p-3" method="post" action="" id="SignIn">
+            {{ form.csrf_token() }}
+            {{ displayField(form.username, 'Username', autocomplete="off") }}
+            {{ displayField(form.email, 'excitedToGraduate@emailservice.com', autocomplete="off") }}
+            {{ displayField(form.password) }}
+            {{ displayField(form.confirm_password) }}
+            <button type="submit" class="btn" style="background-color: gold;">Submit</button>
+          </form>
+        </div>
+        <div class="mt-3 p-3">
+          <p class="mb-0">If you already have an account:</p>
+          <button type="redirect"
+                  class="btn align-right"
+                  style="background-color: green;
+                         color: white;">LogIn</button>
+        </div>
+      </div>
+    </div>
+    {{ postRail() }}
   </div>
 {% endblock content %}

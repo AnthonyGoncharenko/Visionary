@@ -1,7 +1,3 @@
-body {
-    font-family: 'Ubuntu', sans-serif;
-}
-
 .home-tab {
     background-color: crimson;
 }
@@ -101,6 +97,22 @@ body {
 
 .crimson-background {
     background-image: linear-gradient(0deg, red, white);
+}
+
+.gold-background {
+    background-image: linear-gradient(0deg, yellow, white);
+}
+
+.lime-background {
+    background-image: linear-gradient(0deg, greenyellow, white);
+}
+
+.magenta-background {
+    background-image: linear-gradient(0deg, magenta, white);
+}
+
+.orange-background {
+    background-image: linear-gradient(0deg, orange, white);
 }
 
 .blog-backing {

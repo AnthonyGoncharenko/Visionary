@@ -1,7 +1,7 @@
 {% macro postfeed(posts) %}
   <div class="col-8 p-0">
-    <div class="overflow-auto container scrollarea crimson-background">
-      <div class="p-5 m-5 blog-backing">
+    <div class="p-5 overflow-auto container scrollarea crimson-background">
+      <div class="p-5 blog-backing">
         <div class="mb-3 d-flex justify-content-center">
           <img id="PostImage">
         </div>
@@ -14,7 +14,7 @@
   </div>
 {% endmacro %}
 {% macro postRail(posts) %}
-  <div class="col-4 p-0">
+  <div class="col p-0">
     <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
       <a href="/"
          class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5"
@@ -27,7 +27,7 @@
             <strong class="mb-1">Post Title</strong>
             <small class>Post Date?</small>
           </div>
-          <div class="col-10 mb-1 small">Post Preview?</div>
+          <div class="col-4 mb-1 small">Post Preview?</div>
         </a>
       </div>
     </div>
