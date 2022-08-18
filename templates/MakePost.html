@@ -1,5 +1,4 @@
-{% from 'form_helper.html' import displayField %}
-{% from 'macros/common_elements.jinja' import postfeed, postRail %}
+{% from 'macros/common_elements.jinja' import postRail %}
 {% extends "base.html" %}
 {% block title %}
   Make a Post
@@ -9,22 +8,32 @@
   {{ super() }}
 {% endblock head %}
 {% block content %}
-  <div class="row m-0 h-100" >
-    <div class="col-8 p-0 magenta-background mb-auto h-100">
-      <div class="p-3 overflow-auto container-fluid scrollarea">
-        <h1 class="SignInheader">Username's New Post</h1>
-        {% if error_messages %}
-          {% for message in error_messages %}<h2>{{ message }}</h2>{% endfor %}
-        {% endif %}
-        <form id="SignIn" class="SignIn" method="post" action="">
-          <div class="form-group"></div>
+<div class="row m-0 h-100" >
+  <div class="col-8 p-0 magenta-background mb-auto h-100">
+    <div class="p-5 overflow-auto container-fluid scrollarea">
+      <h1 class="signupheader">Orchestrate Your New Post</h1>
+      {% if error_messages %}
+        {% for message in error_messages %}<h2>{{ message }}</h2>{% endfor %}
+      {% endif %}
+      <div class="col-5 border rounded flex-md-row shadow-sm border-dark" style="border-color: darkmagenta!important; background-color: palevioletred;">
+        <form class="p-3" method="post" action="" id="SignIn">
+          <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Post Title</label>
+            <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+          </div>
+          <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">Content of Your Post</label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Default file input example</label>
+            <input class="form-control" type="file" id="formFile" accept=".png,.jpg">
+          </div>
+          <button type="submit" class="btn" style="background-color: magenta; color:white;">Preview your Post</button>
         </form>
-        <div class="PostTableDiv">
-          <table class="PostTable" id="TrendingPostTable">
-          </table>
-        </div>
       </div>
     </div>
-    {{ postRail() }}
   </div>
+  {{ postRail() }}
+</div>
 {% endblock content %}
