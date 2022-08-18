@@ -9,10 +9,8 @@
   <script src="TrendingPosts.js"></script>
 </head>
 {% block content %}
-  <div class="container-fluid p-0">
-    <div class="row">
-      {{ postfeed() }}
-      {{ postRail() }}
-    </div>
+  <div class="row m-0 h-100">
+    {{ postfeed() }}
+    {{ postRail() }}
   </div>
 {% endblock content %}
