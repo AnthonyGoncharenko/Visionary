@@ -2,25 +2,22 @@
 {% from 'macros/common_elements.jinja' import postfeed, postRail %}
 {% extends "base.html" %}
 {% block title %}
-  SignIn
+  Make a Post
 {% endblock title %}
-{% set activePage = 3 %}
+{% set activePage = 1 %}
 {% block head %}
   {{ super() }}
 {% endblock head %}
 {% block content %}
   <div class="row m-0 h-100" >
-    <div class="col-8 p-0 lime-background mb-auto h-100">
+    <div class="col-8 p-0 magenta-background mb-auto h-100">
       <div class="p-3 overflow-auto container-fluid scrollarea">
-        <h1 class="SignInheader">Sign In</h1>
+        <h1 class="SignInheader">Username's New Post</h1>
         {% if error_messages %}
           {% for message in error_messages %}<h2>{{ message }}</h2>{% endfor %}
         {% endif %}
-        <form id="SignIn" class="SignIn" method="post" action=""> <!---this cannot stand its a lil messy cause we have misalignment on our lovely fields-->
-          {{ form.csrf_token() }}
-          {{ displayField(form.username, 'Username', autocomplete="off", autofocus=true) }}
-          {{ displayField(form.password, 'Password') }}
-          <div class="form-group">{{ form.submit(class="SubmitButton")}}</div>
+        <form id="SignIn" class="SignIn" method="post" action="">
+          <div class="form-group"></div>
         </form>
         <div class="PostTableDiv">
           <table class="PostTable" id="TrendingPostTable">
@@ -31,4 +28,3 @@
     {{ postRail() }}
   </div>
 {% endblock content %}
-
