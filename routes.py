@@ -29,7 +29,7 @@ logout = Blueprint('logout', __name__)
 #                           GET DATABASE
 ########################################################################
 def get_db():
-    DATABASE = 'users.db'
+    DATABASE = 'visionary_database.db'
     db = getattr(g, '_database', None)
     if db is None:
         db = Database(DATABASE)

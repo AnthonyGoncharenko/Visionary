@@ -1,13 +1,9 @@
 {% macro displayField(fieldName, placeHolderValue) %}
-
-<div class="FormText">
-  {{ fieldName.label }} {{ fieldName(class="FormInputText", placeholder=placeHolderValue, **kwargs) }}
-  <!-- Error Messages -->
-  <ul>
-    {% for error in fieldName.errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-</div>
-
+  <div class="formtext">
+    {{ fieldName.label }} {{ fieldName(class="forminputtext", placeholder=placeHolderValue, **kwargs) }}
+    <!-- Error Messages -->
+    <ul>
+      {% for error in fieldName.errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+  </div>
 {% endmacro %}

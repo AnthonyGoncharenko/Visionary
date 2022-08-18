@@ -199,7 +199,10 @@ body {
   height: 300px;
   font-size: 20px;
 }
-
+table {
+  margin-left: auto; 
+  margin-right: auto
+}
 .wordc {
   font-size: 20px;
   position: relative;
@@ -222,7 +225,7 @@ body {
 /*///////////////////////////////////////////////////////////////////////////////////////////////// */
 /*Styles for Sign up */
 
-.FormInputText {
+.forminputtext {
   width: 100%;
   padding: 5px 5px;
   margin: 8px 0;
@@ -231,11 +234,13 @@ body {
   box-sizing: border-box;
 }
 
-.FormText {
+.formtext {
   color: white;
 }
-
-.SubmitButton {
+.posttablediv{
+  width: 30%
+}
+.submitbutton {
   background-color: #595959;
   color: white;
   padding: 14px 20px;
@@ -245,21 +250,21 @@ body {
   width: 100%;
 }
 
-.SubmitButton:hover {
+.submitbutton:hover {
   background-color: #2e2e2e;
 }
 
-.SignUp {
+.signup {
   width: 60%;
 }
 
-.SignUpStyle {
+.signupstyle {
   background-color: #234995;
   /* For browsers that do not support gradients */
   background-image: linear-gradient(to right, #234995, #acadaf);
 }
 
-.SignUpheader {
+.signupheader {
   text-align: center;
   color: white;
 }
