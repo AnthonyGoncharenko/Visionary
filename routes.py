@@ -103,10 +103,7 @@ def sign_up_page():
 ########################################################################
 @home.route('/home', methods=['GET', 'POST'])
 def home_page():
-    if 'user' in session:
-        return render_template("Home.html")
-    else:
-        return redirect(url_for('signin.sign_in_page'))
+    return render_template("Home.html")
 ########################################################################
 #                         END HOME PAGE
 ########################################################################
