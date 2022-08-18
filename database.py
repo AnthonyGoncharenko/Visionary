@@ -97,6 +97,7 @@ class Database:
         data = self.__select('SELECT * FROM users WHERE username=?', [username])
         if data:
             d = data[0]
+            print(d)
             return {
             'user_id' : d[0],
             'username': d[1],
@@ -136,25 +137,22 @@ class Database:
         return { 
             'posts' : res
          }
-    def get_n_trending_posts(self, n: int):
-        data = self.__select('SELECT TOP ? FROM posts SORT BY clicks', [n])
+    def get_n_trending_posts(self, n):
+        data = self.__select('SELECT * FROM posts ORDER BY clicks LIMIT ?', [n])
 
         return {
             'posts' : [post_to_dict(post) for post in data]
         }
 
-    def get_n_recent_posts(self, n: int):
-        data = self.__select('SELECT TOP ? FROM posts ORDER BY DATE DESC', [n])
+    def get_n_recent_posts(self, n):
+        data = self.__select('SELECT * FROM posts ORDER BY DATE DESC LIMIT ?', [n])
 
         return {
             'posts' : [post_to_dict(post) for post in data]
         }
 
     def get_n_followed_posts(self, username, n):
-        data = self.__select("""SELECT TOP ? 
-                                FROM posts, ( SELECT followed FROM users where username=? ) 
-                                WHERE posts.pid = followed 
-                                ORDER BY posts.DATE""", [n, username])
+        data = self.__select("SELECT * FROM posts, ( SELECT followed FROM users where username=? ) WHERE posts.pid = followed ORDER BY posts.DATE LIMIT ?", [username, n])
         
         return {
             'posts' : [post_to_dict(post) for post in data]

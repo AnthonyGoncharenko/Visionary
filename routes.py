@@ -43,7 +43,7 @@ def sign_in_page():
             password = request.form['password']
             print("CHECKING THE DATABASE FOR THE USER DATA...")
             if (response := get_db().get_user(request.form['username'])) is None:
-                print('USER ALREADY EXISTS IN DATABASE')
+                print('USER DOES NOT EXIST IN DATABASE')
                 return render_template("SignIn.html", form=SignInForm(), error_messages = ['USER DOES NOT EXIST IN DATABASE'])
             if not pbkdf2_sha256.verify(password, response['encrypted_password']):
                 print('PASSWORD DOES NOT MATCH')
@@ -129,20 +129,32 @@ def post_to_dict(post):
 def trending_posts():
     """
     trending_posts Get top 10 posts from the database, and return them in a list
-    """
-    posts = get_db().get_n_trending_posts(n)
+
+    :return: List of Post dictionaries
+    :rtype: List[dict]
+    """ 
+    posts = get_db().get_n_trending_posts(10)['posts']
     return [ post_to_dict(post) for post in posts ]
     
 def recent_posts():
     """
     recent_posts Get 10 most recent posts from the database, and return them in a list
-    """
-    posts = get_db().get_n_recent_posts(n)
+
+    :return: List of Post dictionaries
+    :rtype: List[dict]
+    """    
+    posts = get_db().get_n_recent_posts(10)['posts']
     return [ post_to_dict(post) for post in posts ]
 
 def followed_posts():
+    """
+    followed_posts Get 10 newest posts from followed authors
+
+    :return: List of Post dictionaries
+    :rtype: List[dict]
+    """    
     if 'user' in session:
-        posts = get_db().get_n_followed_posts(session['user'], 10)
+        posts = get_db().get_n_followed_posts(session['user'], 10)['posts']
         return [ post_to_dict(post) for post in posts ]
     return []
 
