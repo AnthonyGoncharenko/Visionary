@@ -158,9 +158,13 @@ def followed_posts():
         return [ post_to_dict(post) for post in posts ]
     return []
 
-def delete_post():
-    #TODO
-    return
+def delete_post(pid):
+    if 'user' in session:
+        if post := get_db().get_post_by_id(pid)['posts']:
+            if (user := get_db().get_user_by_id(post["uid"])) is not None:
+                if user['username'] == session['user']:
+                    get_db().delete_post(pid)
+
 
 # @home.route('/')
 # @home.route('/home')

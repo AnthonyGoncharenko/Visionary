@@ -12,6 +12,16 @@ def post_to_dict(post):
     m["date"] = post[6]
     return m
 
+def user_to_dict(user):
+    m = {}
+    m["user_id"] = user[0]
+    m["username"] = user[1]
+    m["encrypted_password"] = user[2]
+    m["email"] = user[3]
+    m["followed"] = user[4]
+    m["posts"] = user[5]
+    return m
+
 class Database:
     def __init__(self, database_name):
         if not os.path.exists(database_name):
@@ -96,24 +106,19 @@ class Database:
     def get_user(self, username):
         data = self.__select('SELECT * FROM users WHERE username=?', [username])
         if data:
-            d = data[0]
-            print(d)
-            return {
-            'user_id' : d[0],
-            'username': d[1],
-            'encrypted_password': d[2],
-            'email': d[3],
-            'followed': d[4],
-            'posts' : d[5],
-            }
-
+            return user_to_dict(data[0])
+    def get_user_by_uid(self, uid):
+        data = self.__select('SELECT * FROM users WHERE uid=?', [uid])
+        if data:
+            return user_to_dict(data[0])
     def create_post(self, username, title, content, img):
         if (response := self.get_user(username)) is None:
             return 
         self.create_img(response['user_id'], img)
         imid = self.__get_img_id(response['user_id'], img)[0]
         self.__execute('INSERT INTO posts (uid, title, content, imid) VALUES (?, ?, ?, ?)', [response['user_id'], title, content, imid])
-
+    def delete_post(self, pid):
+        self.__execute("DELETE FROM posts where pid=?", [pid])
     def create_img(self, uid, img):
         self.__execute('INSERT INTO images (uid, img) VALUES (?, ?)', [uid, img])
 
@@ -157,6 +162,16 @@ class Database:
         return {
             'posts' : [post_to_dict(post) for post in data]
         }
+    def get_post_by_id(self, pid):
+        data = self.__select("SELECT * FROM posts WHERE pid=?", [pid])
+        return {
+            'posts' : [post_to_dict(post) for post in data]
+        }
+    
+    #TODO
+    def follow(self, uid, pid):
+        self.__execute("")
+    
     def close(self):
         self.conn.close()
 
