@@ -44,8 +44,8 @@ class Database:
             username VARCHAR(25) UNIQUE NOT NULL, 
             password TEXT NOT NULL,
             email VARCHAR(120) NOT NULL,
-            followed INTEGER[],
-            posts INTEGER[]
+            followed TEXT DEFAULT "",
+            posts TEXT DEFAULT ""
          );''')
         self.conn.commit()
         ###############################################
@@ -63,7 +63,7 @@ class Database:
             title TEXT NOT NULL,
             content TEXT NOT NULL,
             imid INTEGER,
-            clicks INTEGER,
+            clicks INTEGER DEFAULT 0,
             date DATE,
             FOREIGN KEY(uid) REFERENCES users(uid),
             FOREIGN KEY(imid) REFERENCES images(imid)
@@ -112,11 +112,20 @@ class Database:
         if data:
             return user_to_dict(data[0])
     def create_post(self, username, title, content, img):
-        if (response := self.get_user(username)) is None:
+        if (user := self.get_user(username)) is None:
             return 
-        self.create_img(response['user_id'], img)
-        imid = self.__get_img_id(response['user_id'], img)[0]
-        self.__execute('INSERT INTO posts (uid, title, content, imid) VALUES (?, ?, ?, ?)', [response['user_id'], title, content, imid])
+        self.create_img(user['user_id'], img)
+        imid = self.__get_img_id(user['user_id'], img)[0]
+        self.__execute('INSERT INTO posts (uid, title, content, imid) VALUES (?, ?, ?, ?)', [user['user_id'], title, content, imid])
+        
+        pid = self.__select("SELECT pid FROM posts WHERE uid=? AND title=? AND content=? AND imid=?", [user['user_id'], title, content, imid])
+        posts = user["posts"].split(" ")
+
+        if str(pid) not in posts:
+            posts.append(str(pid))
+            new_posts = " ".join(posts)
+            self.__execute("UPDATE users SET posts=? WHERE uid=?", [new_posts, uid])
+
     def delete_post(self, pid):
         self.__execute("DELETE FROM posts where pid=?", [pid])
     def create_img(self, uid, img):
@@ -168,10 +177,14 @@ class Database:
             'posts' : [post_to_dict(post) for post in data]
         }
     
-    #TODO
     def follow(self, uid, pid):
-        self.__execute("")
-    
+        if (user := self.get_user_by_uid(uid)) is not None:
+            followed = user["followed"].split(" ")
+            if str(pid) not in followed:
+                followed.append(str(pid))
+                new_followed = " ".join(followed)
+                self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
+
     def close(self):
         self.conn.close()
 

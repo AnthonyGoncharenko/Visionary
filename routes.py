@@ -42,12 +42,10 @@ def sign_in_page():
         if form.validate_on_submit():
             password = request.form['password']
             print("CHECKING THE DATABASE FOR THE USER DATA...")
-            if (response := get_db().get_user(request.form['username'])) is None:
-                print('USER DOES NOT EXIST IN DATABASE')
+            if ((user := get_db().get_user(request.form['username'])) is None or 
+                    not pbkdf2_sha256.verify(password, user['encrypted_password'])):
+                print('USERNAME OR PASSWORD DOES NOT MATCH')
                 return render_template("SignIn.html", form=SignInForm(), error_messages = ['USER DOES NOT EXIST IN DATABASE'])
-            if not pbkdf2_sha256.verify(password, response['encrypted_password']):
-                print('PASSWORD DOES NOT MATCH')
-                return render_template("SignIn.html", form=SignInForm(), error_messages = ['PASSWORD DOES NOT MATCH'])
             print("REDIRECT TO THE HOME PAGE...")
             username = request.form['username']
             session['user'] = username
@@ -72,14 +70,13 @@ def sign_up_page():
 
             if (response := get_db().get_user(request.form['username'])) is not None:
                 print('USER ALREADY EXISTS IN DATABASE...')
-                print('REDIRECTING TO SIGNUP')
                 return render_template("SignUp.html", form=SignUpForm(), error_messages = ['USER ALREADY EXISTS IN DATABASE'])
 
             print("ADDING USER TO THE DATABASE...")
 
             get_db().create_user(request.form['username'], encrypted_password, request.form['email'])
 
-            print("REDIRECTING TO THE SIGNIN...")
+            print("REDIRECTING TO SIGN IN...")
 
             return redirect(url_for("signin.sign_in_page"))
     return render_template("SignUp.html", form=form)
@@ -93,14 +90,12 @@ def sign_up_page():
 ########################################################################
 @home.route('/home', methods=['GET', 'POST'])
 def home_page():
-    if 'user' in session:
-        return render_template("Home.html", session=session, 
-        followed_posts=followed_posts(), 
+    return render_template("Home.html", 
+        session=session if 'user' in session else None, 
+        followed_posts=followed_posts() if 'user' in session else [], 
         trending_posts=trending_posts(), 
         recent_posts=recent_posts())
-    else:
-        return render_template("Home.html", trending_posts=trending_posts(), recent_posts=recent_posts())
-        
+   
 ########################################################################
 #                         END HOME PAGE
 ########################################################################
@@ -111,7 +106,8 @@ def home_page():
 ########################################################################
 @home.route('/post', methods=['GET', 'POST'])
 def post_page():
-    return render_template("MakePost.html")
+    if 'user' in session:
+        return render_template("MakePost.html", session=session)
 ########################################################################
 #                         MAKE POST PAGE
 ########################################################################
@@ -139,6 +135,29 @@ def logout_page():
 ########################################################################
 #                         END LOG OUT
 ########################################################################
+
+########################################################################
+#                      DATABASE QUERYING
+########################################################################
+@home.route('/api/db/', methods=['GET', 'POST', 'DELETE'])
+def database_querying():
+    #TODO
+    
+    if request.method == 'GET':
+        ...
+    elif request.method == 'POST':
+        ...
+    elif request.method == 'DELETE':
+        ...
+
+
+    if 'user' in session:
+        ...
+########################################################################
+#                    END DATABASE QUERYING
+########################################################################
+
+
 
 def post_to_dict(post):
     m = {}
@@ -186,7 +205,11 @@ def delete_post(pid):
             if (user := get_db().get_user_by_id(post["uid"])) is not None:
                 if user['username'] == session['user']:
                     get_db().delete_post(pid)
-
+def follow(pid):
+    if 'user' in session:
+        db = get_db()
+        uid = db.get_user(session['user'])["user_id"]
+        db.follow(uid, pid)
 
 # @home.route('/')
 # @home.route('/home')
