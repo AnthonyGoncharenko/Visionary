@@ -101,7 +101,7 @@ def sign_up_page():
 ########################################################################
 #                           HOME PAGE
 ########################################################################
-@home.route('/home', methods=['GET', 'POST'])
+@home.route('/home', methods=['GET'])
 def home_page():
     return render_template("Home.html")
 ########################################################################
@@ -112,7 +112,7 @@ def home_page():
 ########################################################################
 #                           MAKE POST PAGE
 ########################################################################
-@home.route('/post', methods=['GET', 'POST'])
+@home.route('/post', methods=['GET', 'POST', 'DELETE'])
 def post_page():
     return render_template("MakePost.html")
 ########################################################################
@@ -123,7 +123,7 @@ def post_page():
 ########################################################################
 #                           FIND AUTHORS PAGE
 ########################################################################
-@home.route('/authors', methods=['GET', 'POST'])
+@home.route('/authors', methods=['GET', 'POST', 'DELETE'])
 def authors_page():
     return render_template("FindAuthors.html")
 ########################################################################
