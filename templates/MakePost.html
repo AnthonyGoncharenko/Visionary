@@ -1,4 +1,5 @@
 {% from 'macros/common_elements.jinja' import postRail %}
+{% from 'form_helper.html' import displayField, textField, imageField %}
 {% extends "base.html" %}
 {% block title %}
   Make a Post
@@ -17,7 +18,11 @@
         {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
       {% endif %}
       <div class="col-5 border rounded flex-md-row shadow-sm border-dark" style="border-color: darkmagenta!important; background-color: palevioletred;">
-        <form class="p-3" method="post" action="" id="SignIn">
+        <form class="p-3" method="post" action="">
+            {{ form.csrf_token() }}
+            {{ displayField(form.post_title, autocomplete="off") }}
+            {{ textField(form.post_content, rows=3, autocomplete="off") }}
+            {{ imageField(form.post_image, accept=".png,.jpg", autocomplete="off") }}
           <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Post Title</label>
             <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="My New Post!">

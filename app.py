@@ -9,6 +9,7 @@ from CommentForm import CommentForm
 from database import Database
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
+from PostForm import PostForm
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
@@ -103,8 +104,9 @@ def sign_up_page():
 @app.route('/makepost', methods=['GET', 'POST'])
 def make_post_page():
     if 'user' in session:
+        form = PostForm()
         session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("MakePost.html", session=session)
+        return render_template("MakePost.html", session=session, form=form)
     else:
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
@@ -210,11 +212,11 @@ def make_comment_page(pid):
 ########################################################################
 #                           LOG OUT
 ########################################################################
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['GET'])
 def logout_page():
     if 'user' in session:
         session.pop('user_details', None)
-        session.pop('user', None)        
+        session.pop('user', None)
     return redirect(url_for('sign_in_page'))
 ########################################################################
 #                         END LOG OUT
