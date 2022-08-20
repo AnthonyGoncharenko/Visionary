@@ -1,10 +1,10 @@
+import os
+
 from flask import Flask, g
 from flask_wtf.csrf import CSRFProtect
-from routes import home, signup, signin, logout
-import os
+
 from database import Database
-from models import User
-from flask_sqlalchemy import SQLAlchemy
+from routes import home, logout, signin, signup
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
