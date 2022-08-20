@@ -1,5 +1,5 @@
-{% from 'macros/form_helper.html' import displayField %}
-{% from 'macros/common_elements.jinja' import postfeed, postRail %}
+{% from 'form_helper.html' import displayField %}
+{% from 'macros/common_elements.jinja' import author_postfeed, authorsTab %}
 {% extends "base.html" %}
 {% block title %}
   Make a Post
@@ -10,21 +10,9 @@
 {% endblock head %}
 {% block content %}
   <div class="row m-0 h-100">
-    <div class="col-8 p-0 orange-background mb-auto h-100">
-      <div class="p-3 overflow-auto container-fluid scrollarea">
-        <h1 class="SignInheader">Username's New Post</h1>
-        {% if error_messages %}
-          {% for message in error_messages %}<h2>{{ message }}</h2>{% endfor %}
-        {% endif %}
-        <form id="SignIn" class="SignIn" method="post" action="">
-          <div class="form-group"></div>
-        </form>
-        <div class="PostTableDiv">
-          <table class="PostTable" id="TrendingPostTable">
-          </table>
-        </div>
-      </div>
+    <div class="col-8 p-0">
+      {{ author_postfeed() }}
     </div>
-    {{ postRail() }}
+    {{ authorsTab() }}
   </div>
 {% endblock content %}

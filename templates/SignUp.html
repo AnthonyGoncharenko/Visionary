@@ -11,18 +11,17 @@
 {% block content %}
   <div class="row m-0 h-100" >
     <div class="col-8 p-0 gold-background mb-auto h-100">
-      <div class="p-5 overflow-auto container-fluid scrollarea">
+      <div class="p-5 overflow-auto container-fluid">
         <h1 class="signupheader">Sign Up</h1>
         {% if error_messages %}
-          {% for message in error_messages %}<h2>{{ message }}</h2>{% endfor %}
+          <p class="mb-0">Sorry... We ran into some problems:</p>
+          {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
         {% endif %}
-        <div class="col-5 border rounded flex-md-row shadow-sm border-dark"
-             style="border-color: darkgoldenrod!important;
-                    background-color: palegoldenrod;">
+        <div class="col-5 border rounded flex-md-row shadow-sm border-dark gold-menu">
           <form class="p-3" method="post" action="" id="SignIn">
             {{ form.csrf_token() }}
-            {{ displayField(form.username, 'Username', autocomplete="off") }}
-            {{ displayField(form.email, 'excitedToGraduate@emailservice.com', autocomplete="off") }}
+            {{ displayField(form.username, 'username', autocomplete="off") }}
+            {{ displayField(form.email, 'user@emailservice.com', autocomplete="off") }}
             {{ displayField(form.password) }}
             {{ displayField(form.confirm_password) }}
             <button type="submit" class="btn" style="background-color: gold;">Submit</button>
@@ -30,10 +29,7 @@
         </div>
         <div class="mt-3 p-3">
           <p class="mb-0">If you already have an account:</p>
-          <button type="redirect"
-                  class="btn align-right"
-                  style="background-color: green;
-                         color: white;">LogIn</button>
+          <button onclick="location.href = '/signin'" class="btn align-right" style="background-color: green; color: white;">LogIn</button>
         </div>
       </div>
     </div>
