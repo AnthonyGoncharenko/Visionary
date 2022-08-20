@@ -9,6 +9,7 @@ from CommentForm import CommentForm
 from database import Database
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
+from PostForm import PostForm
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
@@ -102,9 +103,12 @@ def sign_up_page():
 ########################################################################
 @app.route('/makepost', methods=['GET', 'POST'])
 def make_post_page():
+    if 'user' in session and request.method == 'POST':
+        get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], request.form['post_image'])
     if 'user' in session:
+        form = PostForm()
         session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("MakePost.html", session=session)
+        return render_template("MakePost.html", session=session, form=form)
     else:
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
@@ -115,12 +119,12 @@ def make_post_page():
 ########################################################################
 #                         VIEW POST PAGE
 ########################################################################
-@app.route('/view_post/<int:pid>', methods=['GET'])
-def view_post_page(pid):
-    if request.method == 'GET':
+@app.route('/view_post', methods=['GET'])
+def view_post_page():
+    if request.method == 'GET' :
         if 'user' in session:
             session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("ViewPost.html", session=session, canDelete=canDelete(pid))
+        return render_template("ViewPost.html", session=session, postId = request.args.get('post_id'), canDelete=canDelete(request.args.get('post_id')))
     else:
         return redirect(url_for('home_page'))
 ########################################################################
@@ -210,11 +214,11 @@ def make_comment_page(pid):
 ########################################################################
 #                           LOG OUT
 ########################################################################
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['GET'])
 def logout_page():
     if 'user' in session:
         session.pop('user_details', None)
-        session.pop('user', None)        
+        session.pop('user', None)
     return redirect(url_for('sign_in_page'))
 ########################################################################
 #                         END LOG OUT
@@ -258,9 +262,9 @@ def close_connection(exception):
 def post_to_dict(post):
     m = {}
     m['pid'] = post['pid']
-    m['author'] = post['author']
+    m['uid'] = post['uid']
     m['title'] = post['title']
-    m['data'] = post['data']
+    m['content'] = post['content']
     return m
 
 def trending_posts():
