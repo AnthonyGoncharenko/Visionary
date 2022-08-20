@@ -1,15 +1,27 @@
 {% macro postfeed(posts) %}
-  <div class="col-8 p-0">
-    <div class="p-5 overflow-auto container scrollarea crimson-background">
-        <div class="p-5 blog-backing">
-          <div class="mb-3 d-flex justify-content-center">
-            <img id="PostImage">
-          </div>
-          <div>
-            <h2 id="PostHeader" class="montserrat"></h2>
-            <p id="PostText"></p>
-          </div>
-      </div>
+  <div class="p-5 overflow-auto container crimson-background">
+    {% for post_info in posts %}
+        {{ post(post_info) }}
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro author_postfeed(author_posts) %}
+  <div class="p-5 overflow-auto container magenta-background">
+    {% for post_info in posts %}
+        {{ post(post_info) }}
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro post(post_info) %}
+  <div class="p-5 blog-backing">
+    <div class="mb-3 d-flex justify-content-center">
+      <img id="PostImage" src="post_info.image" >
+    </div>
+    <div>
+      <h2 id="PostHeader" class="montserrat">{{ post_info.title }}</h2>
+      <p id="PostText"> {{ post_info.content }} </p>
     </div>
   </div>
 {% endmacro %}
@@ -21,26 +33,69 @@
         <span class="fs-5 fw-semibold montserrat" style="color: white">Trending Posts</span>
       </div>
       <div class="list-group list-group-flush border-bottom border-dark border-3">
-        <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
-          <div class="d-flex w-100 align-items-center justify-content-between">
-            <strong class="mb-1">Post Title</strong>
-            <small class>Post Date?</small>
-          </div>
-          <div class="col-4 mb-1 small">Post Preview?</div>
-        </a>
+        {% for post in posts %}
+          {{ minipost(post) }}
+        {% endfor %}
       </div>
     </div>
   </div>
 {% endmacro %}
 
-{% macro postPreview(minipost) %}
-  <div class="list-group list-group-flush border-bottom border-dark border-3">
-    <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
-      <div class="d-flex w-100 align-items-center justify-content-between">
-        <strong class="mb-1">{{ minipost.title }}</strong>
-        <small class>{{ minipost.date }}</small>
+{% macro authorsTab(authors) %}
+  <div class="col p-0">
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
+      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, magenta, darkmagenta);">
+        <span class="fs-5 fw-semibold montserrat" style="color: white">Followed Authors</span>
       </div>
-      <div class="col-4 mb-1 small">By {{ minipost.author }}</div>
-    </a>
+      <div class="list-group list-group-flush border-bottom border-dark border-3">
+        {% for author in authors %}
+          {{ author_info(author) }}
+        {% endfor %}
+      </div>
+    </div>
   </div>
+{% endmacro %}
+
+
+
+{% macro commentSection(comments) %}
+  <div class="col p-0">
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
+      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, darkgrey, black);">
+        <span class="fs-5 fw-semibold montserrat" style="color: white">Comments on this Post</span>
+      </div>
+      <div class="list-group list-group-flush border-bottom border-dark border-3">
+        {% for comment_info in comments %}
+          {{ comment(comment_info) }}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro minipost(post) %}
+  <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
+    <div class="d-flex w-100 align-items-center justify-content-between">
+      <strong class="mb-1">{{ post.title }}</strong>
+      <small class>{{ post.date }}</small>
+    </div>
+    <div class="col-4 mb-1 small">By {{ post.author }}</div>
+  </a>
+{% endmacro %}
+
+{% macro author_info(author) %}
+  <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
+    <div class="d-flex w-100 align-items-center justify-content-center">
+      <strong class="mb-1">{{ author.username }}</strong>
+    </div>
+  </a>
+{% endmacro %}
+
+{% macro comment(comment_info) %}
+  <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
+    <div class="col-4 mb-1 small">{{ comment_info.author }}</div>
+    <div class="d-flex w-100 align-items-center justify-content-between">
+      <strong class="mb-1">{{ comment_info.content }}</strong>
+    </div>
+  </a>
 {% endmacro %}

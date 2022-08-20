@@ -1,0 +1,30 @@
+{% from 'macros/common_elements.jinja' import commentSection %}
+{% extends "base.html" %}
+{% block title %}
+  Make a Post
+{% endblock title %}
+{% set activePage = 0 %}
+{% set post = postId %}
+{% block head %}
+  {{ super() }}
+{% endblock head %}
+{% block content %}
+<div class="row m-0 h-100" >
+  <div class="col-8 p-0 crimson-background mb-auto h-100">
+    <div class="p-5 overflow-auto container-fluid">
+      <div class="p-5 blog-backing">
+        <h1> {{ post.title }} </h1>
+        <h2> By {{ post.auhtor }} </h2>
+        <small> {{ post.date }}</small>
+        <div class="mb-3 d-flex justify-content-center">
+          <img id="PostImage" src="post_info.image" >
+        </div>
+        <div class="m-3 p-4" style="background-color: white;">
+          <p id="PostText"> {{ post.content }} </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ commentSection() }}
+</div>
+{% endblock content %}
