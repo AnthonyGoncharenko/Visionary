@@ -157,9 +157,10 @@ def follow_author(pid):
 #                         UNFOLLOW AN AUTHOR
 ########################################################################
 
-@app.route('/unfollow_author/<int:pid>', methods=['POST'])
-def unfollow_author(pid):
-    unfollow(pid)
+@app.route('/unfollow_author', methods=['POST'])
+def unfollow_author():
+    if 'pid' in request.args:
+        unfollow(requet.args['pid'])
     return redirect(url_for(request.referrer))
 
 ########################################################################
@@ -219,6 +220,7 @@ def logout_page():
 ########################################################################
 #                         END LOG OUT
 ########################################################################
+
 
 ########################################################################
 #                      DATABASE QUERYING
@@ -319,6 +321,7 @@ def unfollow(pid):
         db = get_db()
         uid = db.get_user(session['user'])["user_id"]
         db.unfollow(uid, pid)
+
 csrf.init_app(app)
 
 if __name__ == '__main__':
