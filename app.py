@@ -237,7 +237,7 @@ def profile_page():
             session['user_details'] = db.get_user(session['user'])
             posts = db.get_posts_from_author(session['user'])['posts']
             user = db.get_user_by_uid(session['user_details']['user_id'])
-            
+
             print(posts)
             
             return render_template("Profile.html", user=user, session=session, posts=posts)
