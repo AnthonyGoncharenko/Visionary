@@ -52,25 +52,50 @@
           {{ author_info(author) }}
         {% endfor %}
       </div>
->>>>>>> main
     </div>
   </div>
 {% endmacro %}
-{% macro postRail(posts) %}
+
+
+
+{% macro commentSection(comments) %}
   <div class="col p-0">
     <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
-      <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, orange, chocolate);">
-        <span class="fs-5 fw-semibold montserrat" style="color: white">Trending Posts</span>
-      </a>
-      <div class="list-group list-group-flush border-bottom border-dark border-3">
-        <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
-          <div class="d-flex w-100 align-items-center justify-content-between">
-            <strong class="mb-1">Post Title</strong>
-            <small class>Post Date?</small>
-          </div>
-          <div class="col-4 mb-1 small">Post Preview?</div>
-        </a>
+      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, darkgrey, black);">
+        <span class="fs-5 fw-semibold montserrat" style="color: white">Comments on this Post</span>
       </div>
+      <div class="list-group list-group-flush border-bottom border-dark border-3">
+        {% for comment_info in comments %}
+          {{ comment(comment_info) }}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro minipost(post) %}
+  <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
+    <div class="d-flex w-100 align-items-center justify-content-between">
+      <strong class="mb-1">{{ post.title }}</strong>
+      <small class>{{ post.date }}</small>
+    </div>
+    <div class="col-4 mb-1 small">By {{ post.author }}</div>
+  </a>
+{% endmacro %}
+
+{% macro author_info(author) %}
+  <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
+    <div class="d-flex w-100 align-items-center justify-content-center">
+      <strong class="mb-1">{{ author.username }}</strong>
+    </div>
+  </a>
+{% endmacro %}
+
+{% macro comment(comment_info) %}
+  <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
+    <div class="col-4 mb-1 small">{{ comment_info.author }}</div>
+    <div class="d-flex w-100 align-items-center justify-content-between">
+      <strong class="mb-1">{{ comment_info.content }}</strong>
     </div>
   </a>
 {% endmacro %}

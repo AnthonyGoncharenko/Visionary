@@ -1,4 +1,4 @@
-{% from 'macros/form_helper.html' import displayField %}
+{% from 'form_helper.html' import displayField %}
 {% from 'macros/common_elements.jinja' import postfeed, postRail %}
 {% extends "base.html" %}
 {% block title %}
@@ -9,7 +9,7 @@
   {{ super() }}
 {% endblock head %}
 {% block content %}
-  <div class="row m-0 h-100">
+  <div class="row m-0 h-100" >
     <div class="col-8 p-0 lime-background mb-auto h-100">
       <div class="p-5 overflow-auto container-fluid">
         <h1 class="SignInheader">Sign In</h1>
@@ -22,10 +22,7 @@
             {{ form.csrf_token() }}
             {{ displayField(form.username, 'Username', autocomplete="off") }}
             {{ displayField(form.password) }}
-            <button type="submit"
-                    class="btn"
-                    style="background-color: green;
-                           color: white;">Submit</button>
+            <button type="submit" class="btn" style="background-color: green; color: white;">Submit</button>
           </form>
         </div>
         <div class="mt-3 p-3">
@@ -37,3 +34,4 @@
     {{ postRail() }}
   </div>
 {% endblock content %}
+
