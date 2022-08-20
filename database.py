@@ -24,11 +24,9 @@ def user_to_dict(user):
 
 def comment_to_dict(comment):
     m = {}
-    m["imid"] = comment[0]
-    m["user_id"] = comment[1]
-    m["pid"] = comment[2]
-    m["title"] = comment[3]
-    m["content"] = comment[4]
+    m["user_id"] = comment[0]
+    m["pid"] = comment[1]
+    m["content"] = comment[2]
     return m
 
 class Database:
@@ -103,14 +101,11 @@ class Database:
         c = self.conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS comments
         (
-            imid INTEGER NOT NULL, 
             uid INTEGER NOT NULL,
             pid INTEGER NOT NULL,
-            title TEXT NOT NULL,
             content TEXT NOT NULL,
             FOREIGN KEY(uid) REFERENCES users(uid),
-            FOREIGN KEY(pid) REFERENCES posts(uid),
-            FOREIGN KEY(imid) REFERENCES posts(imid)
+            FOREIGN KEY(pid) REFERENCES posts(uid)
         );''')
         self.conn.commit()
         ###############################################
@@ -221,10 +216,8 @@ class Database:
                 new_followed = " ".join(followed)
                 self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
 
-    def create_comment(self, uid, pid, title, content, img):
-        self.create_img(uid, img)
-        imid = self.__get_img_id(uid, img)[0]
-        self.__execute("INSERT INTO comments (imid, uid, pid, title, content) VALUES (?, ?, ?, ?, ?)", [imid, uid, pid, title, content])
-        
+    def create_comment(self, uid, pid, content):
+        self.__execute("INSERT INTO comments (uid, pid, content) VALUES (?, ?, ?)", [uid, pid, content])
+
     def close(self):
         self.conn.close()

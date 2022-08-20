@@ -200,7 +200,7 @@ def make_comment_page(pid):
             return render_template("MakeComment.html", form=form, session=session)
         elif request.method == 'POST':
             if form.validate_on_submit():
-                get_db().create_comment(session['user_details']['user_id'], pid, request.form.get('title'), request.form.get('content'), request.form.get('img'))
+                get_db().create_comment(session['user_details']['user_id'], pid, request.form.get('content'))
 
 ########################################################################
 #                         END MAKE COMMENT PAGE
