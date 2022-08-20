@@ -13,7 +13,6 @@
 .login-tab {
     background-color: greenyellow;
 }
-
 .signup-tab {
     background-color: yellow;
 }
@@ -116,5 +115,20 @@
 }
 
 .blog-backing {
+    background-color: palevioletred;
+}
+
+.gold-menu {
+    border-color: darkgoldenrod!important; 
+    background-color: palegoldenrod;
+}
+
+.lime-menu {
+    border-color: green!important; 
+    background-color: palegreen;
+}
+
+.magenta-menu {
+    border-color: darkmagenta!important; 
     background-color: palevioletred;
 }

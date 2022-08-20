@@ -1,8 +1,6 @@
-from flask import Flask, render_template
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField
-from wtforms.validators import (DataRequired, Email, EqualTo, Length,
-                                ValidationError)
+from wtforms.validators import (DataRequired, Email, EqualTo, Length, ValidationError)
 
 class SignUpForm(FlaskForm):
     username = StringField(label=('Username'), 
@@ -24,7 +22,7 @@ class SignUpForm(FlaskForm):
 
     def validate_username(self, username):
         print("CHECKING CORRECTNESS OF USERNAME...")
-
+        
         excluded_chars = set(" *?!'^+%&/()=}][{$#")
         for char in self.username.data:
             if char in excluded_chars:
