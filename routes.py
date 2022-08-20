@@ -42,8 +42,7 @@ def sign_in_page():
         if form.validate_on_submit():
             password = request.form['password']
             print("CHECKING THE DATABASE FOR THE USER DATA...")
-            if ((user := get_db().get_user(request.form['username'])) is None or 
-                    not pbkdf2_sha256.verify(password, user['encrypted_password'])):
+            if ((user := get_db().get_user(request.form['username'])) is None or not pbkdf2_sha256.verify(password, user['encrypted_password'])):
                 print('USERNAME OR PASSWORD DOES NOT MATCH')
                 return render_template("SignIn.html", form=SignInForm(), error_messages = ['USER DOES NOT EXIST IN DATABASE'])
             print("REDIRECT TO THE HOME PAGE...")
