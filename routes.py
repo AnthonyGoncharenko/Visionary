@@ -137,11 +137,83 @@ def logout_page():
 ########################################################################
 #                         END LOG OUT
 ########################################################################
+
+########################################################################
+#                      DATABASE QUERYING
+########################################################################
+@home.route('/api/db/', methods=['GET', 'POST', 'DELETE'])
+def database_querying():
+    #TODO
+
+    if request.method == 'GET':
+        ...
+    elif request.method == 'POST':
+        ...
+    elif request.method == 'DELETE':
+        ...
+
+
+    if 'user' in session:
+        ...
+########################################################################
+#                    END DATABASE QUERYING
+########################################################################
+
+def post_to_dict(post):
+    m = {}
+    m['pid'] = post['pid']
+    m['author'] = post['author']
+    m['title'] = post['title']
+    m['data'] = post['data']
+    return m
+
+def trending_posts():
+    """
+    trending_posts Get top 10 posts from the database, and return them in a list
+    :return: List of Post dictionaries
+    :rtype: List[dict]
+    """ 
+    posts = get_db().get_n_trending_posts(10)['posts']
+    return [ post_to_dict(post) for post in posts ]
+
+def recent_posts():
+    """
+    recent_posts Get 10 most recent posts from the database, and return them in a list
+    :return: List of Post dictionaries
+    :rtype: List[dict]
+    """    
+    posts = get_db().get_n_recent_posts(10)['posts']
+    return [ post_to_dict(post) for post in posts ]
+
+def followed_posts():
+    """
+    followed_posts Get 10 newest posts from followed authors
+    :return: List of Post dictionaries
+    :rtype: List[dict]
+    """    
+    if 'user' in session:
+        posts = get_db().get_n_followed_posts(session['user'], 10)['posts']
+        return [ post_to_dict(post) for post in posts ]
+    return []
+
+def delete_post(pid):
+    if 'user' in session:
+        if post := get_db().get_post_by_id(pid)['posts']:
+            if (user := get_db().get_user_by_id(post["uid"])) is not None:
+                if user['username'] == session['user']:
+                    get_db().delete_post(pid)
+def follow(pid):
+    if 'user' in session:
+        db = get_db()
+        uid = db.get_user(session['user'])["user_id"]
+        db.follow(uid, pid)
+
 # @home.route('/')
 # @home.route('/home')
 # def home_page():
 #     form = DocumentUploadForm()
 #     return render_template("home.html", form=form, loadingbar=False)
+
 # @backend.route('/server', methods=['GET', 'POST'])
 # def server():
 #     form = DocumentUploadForm()
@@ -152,6 +224,7 @@ def logout_page():
 #             diagnosis_thread = Thread(target=do_diagnosis, args=("",))
 #             diagnosis_thread.start()
 #     return render_template("diagnosis.html")
+
 # @backend.get('/modelStatus')
 # def modelStatus():
 #     status_file = "diagnosis_status.json"
@@ -162,6 +235,8 @@ def logout_page():
 #             with open(status_file) as f:
 #                 return json.load(f)
 #     return get_status()
+
+
 # def do_diagnosis(path_to_image: str, model_name: str = "dummy_model"):
 #     print("Starting diagnosis function")
 #     status = {}
