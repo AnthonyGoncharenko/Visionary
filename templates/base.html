@@ -14,7 +14,15 @@
       </title>
     {% endblock head %}
   </head>
-  <body class="d-flex flex-column vh-100" style="font-family: 'Ubuntu', sans-serif; padding-top: 158px; background-color:black;">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flashes" style="color: red; padding-top: 10px, ">
+        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+  <body class="d-flex flex-column vh-100"
+        style="font-family: 'Ubuntu', sans-serif; padding-top: 158px; background-color:black;">
     <div class = "fixed-top">
       <header class="py-3 border-bottom border-5 border-dark branding-header">
         <div class="container-fluid d-flex flex-wrap justify-content-center">
