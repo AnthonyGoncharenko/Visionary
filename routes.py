@@ -30,6 +30,7 @@ def get_db():
 ########################################################################
 
 
+
 ########################################################################
 #                           SIGN IN PAGE
 ########################################################################
@@ -87,7 +88,7 @@ def sign_up_page():
 ########################################################################
 #                           HOME PAGE
 ########################################################################
-@home.route('/home', methods=['GET'])
+@home.route('/home', methods=['GET', 'POST'])
 def home_page():
     return render_template("Home.html", 
         session=session if 'user' in session else None, 
@@ -103,7 +104,7 @@ def home_page():
 ########################################################################
 #                           MAKE POST PAGE
 ########################################################################
-@home.route('/makepost', methods=['GET'])
+@home.route('/post', methods=['GET', 'POST'])
 def post_page():
     if 'user' in session:
         return render_template("MakePost.html", session=session)
@@ -113,38 +114,13 @@ def post_page():
 
 
 ########################################################################
-#                           VIEW POST PAGE
-########################################################################
-@home.route('/post', methods=['GET', 'POST', 'DELETE'])
-def view_post_page():
-    post_id = request.args.get('post_id')
-    return render_template("ViewPost.html", postId = post_id)
-########################################################################
-#                         VIEW POST PAGE
-########################################################################
-
-
-########################################################################
 #                           FIND AUTHORS PAGE
 ########################################################################
-@home.route('/authors', methods=['GET', 'POST', 'DELETE'])
+@home.route('/authors', methods=['GET', 'POST'])
 def authors_page():
-    user = request.args.get('user')
-    return render_template("FindAuthors.html", user = user)
+    return render_template("FindAuthors.html")
 ########################################################################
 #                         FIND AUTHORS PAGE
-########################################################################
-
-
-########################################################################
-#                           PROFILE PAGE
-########################################################################
-@home.route('/profile', methods=['GET'])
-def profile_page():
-    user = request.args.get('user')
-    return render_template("Profile.html", user = user)
-########################################################################
-#                         PROFILE PAGE
 ########################################################################
 
 
