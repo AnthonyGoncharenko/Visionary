@@ -1,24 +1,65 @@
 {% macro postfeed(posts) %}
-  <div class="col-8 p-0">
-    <div class="p-5 overflow-auto container scrollarea crimson-background">
-      <div class="p-5 blog-backing">
-        <div class="mb-3 d-flex justify-content-center">
-          <img id="PostImage">
-        </div>
-        <div>
-          <h2 id="PostHeader" class="montserrat"></h2>
-          <p id="PostText"></p>
-        </div>
+  <div class="p-5 overflow-auto container crimson-background">
+    {% for post_info in posts %}
+        {{ post(post_info) }}
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro author_postfeed(author_posts) %}
+  <div class="p-5 overflow-auto container magenta-background">
+    {% for post_info in posts %}
+        {{ post(post_info) }}
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro post(post_info) %}
+  <div class="p-5 blog-backing">
+    <div class="mb-3 d-flex justify-content-center">
+      <img id="PostImage" src="post_info.image" >
+    </div>
+    <div>
+      <h2 id="PostHeader" class="montserrat">{{ post_info.title }}</h2>
+      <p id="PostText"> {{ post_info.content }} </p>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro postRail(posts) %}
+  <div class="col p-0">
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
+      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, orange, chocolate);">
+        <span class="fs-5 fw-semibold montserrat" style="color: white">Trending Posts</span>
       </div>
+      <div class="list-group list-group-flush border-bottom border-dark border-3">
+        {% for post in posts %}
+          {{ minipost(post) }}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro authorsTab(authors) %}
+  <div class="col p-0">
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
+      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, magenta, darkmagenta);">
+        <span class="fs-5 fw-semibold montserrat" style="color: white">Followed Authors</span>
+      </div>
+      <div class="list-group list-group-flush border-bottom border-dark border-3">
+        {% for author in authors %}
+          {{ author_info(author) }}
+        {% endfor %}
+      </div>
+>>>>>>> main
     </div>
   </div>
 {% endmacro %}
 {% macro postRail(posts) %}
   <div class="col p-0">
     <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
-      <a href="/"
-         class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5"
-         style="background-image: linear-gradient(180deg, orange, chocolate);">
+      <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, orange, chocolate);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Trending Posts</span>
       </a>
       <div class="list-group list-group-flush border-bottom border-dark border-3">
@@ -31,5 +72,5 @@
         </a>
       </div>
     </div>
-  </div>
+  </a>
 {% endmacro %}
