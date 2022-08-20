@@ -176,16 +176,19 @@ class Database:
                 'pids' : data[0]
             }
 
-    def get_posts_from_author(self, author):
-        if (post_ids := self.get_posts_ids_by_author(author)) is None:
-            return
+    def get_posts_from_author(self, author):      
+        post_ids = list(self.get_posts_ids_by_author(author)['pids'])[0].split(' ')
         res = []
+        
         for pid in post_ids:
-            post = self.__select('SELECT * FROM posts where pid=?', [pid])[0]
+            if pid == '':
+                continue
+            post = self.__select('SELECT * FROM posts where pid=?', [pid])
             res.append(post_to_dict(post))
         return { 
             'posts' : res
          }
+
     def get_n_trending_posts(self, n):
         data = self.__select('SELECT * FROM posts ORDER BY clicks LIMIT ?', [n])
 
