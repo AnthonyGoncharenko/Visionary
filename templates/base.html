@@ -37,32 +37,23 @@
       <nav class="border-bottom border-bottom border-5 border-dark primary-nav-bar">
         <div class="container-fluid d-flex flex-wrap p-0">
           <ul class="nav me-auto">
-            <li class="nav-link border-end border-5 border-dark home-tab {% if activePage == 0 %} {{ 'active' }} {% endif %}">
+            <li class="nav-link border-end border-5 border-dark home-tab {% if activePage == 0 %} {{ 'active' }}{% endif %}">
               <a href="home" class="nav-link px-2">See What's Hot</a>
             </li>
-            <li class="nav-link border-end border-5 border-dark post-tab {% if activePage == 1 %} {{ 'active' }} {% endif %}">
-              <a href="makepost" class="nav-link px-2">Make a Post</a>
+            <li class="nav-link border-end border-5 border-dark post-tab {% if activePage == 1 %} {{ 'active' }}{% endif %}">
+              <a href="post" class="nav-link px-2">Make a Post</a>
             </li>
-            <li class="nav-link border-end border-5 border-dark author-tab {% if activePage == 2 %} {{ 'active' }} {% endif %}" >
+            <li class="nav-link border-end border-5 border-dark author-tab {% if activePage == 2 %} {{ 'active' }}{% endif %}">
               <a href="authors" class="nav-link px-2">Find Authors</a>
             </li>
           </ul>
           <ul class="nav">
-            {% if 'user' in session %}
-              <li class="nav-link border-start border-5 border-dark login-tab {% if activePage == 5 %} {{ 'active' }} {% endif %}">
-                <a href="logout" class="nav-link px-2">Login</a>
-              </li>
-              <li class="nav-link border-start border-5 border-dark signup-tab {% if activePage == 6 %} {{ 'active' }} {% endif %}">
-                <a href="profile" class="nav-link px-2">{{ session['user'] }}</a>
-              </li> 
-            {% else %}
-              <li class="nav-link border-start border-5 border-dark login-tab {% if activePage == 3 %} {{ 'active' }} {% endif %}">
-                <a href="signin" class="nav-link px-2">Login</a>
-              </li>
-              <li class="nav-link border-start border-5 border-dark signup-tab {% if activePage == 4 %} {{ 'active' }} {% endif %}">
-                <a href="signup" class="nav-link px-2">Sign up</a>
-              </li>  
-            {% endif %}
+            <li class="nav-link border-start border-5 border-dark login-tab {% if activePage == 3 %} {{ 'active' }}{% endif %}">
+              <a href="signin" class="nav-link px-2">Login</a>
+            </li>
+            <li class="nav-link border-start border-5 border-dark signup-tab {% if activePage == 4 %} {{ 'active' }}{% endif %}">
+              <a href="signup" class="nav-link px-2">Sign up</a>
+            </li>
           </ul>
         </div>
       </nav>

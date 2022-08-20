@@ -10,17 +10,16 @@
 {% block content %}
 <div class="row m-0 h-100" >
   <div class="col-8 p-0 magenta-background mb-auto h-100">
-    <div class="p-5 overflow-auto container-fluid">
+    <div class="p-5 overflow-auto container-fluid scrollarea">
       <h1 class="signupheader">Orchestrate Your New Post</h1>
       {% if error_messages %}
-        <p class="mb-0">Sorry... We ran into some problems:</p>
-        {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
+        {% for message in error_messages %}<h2>{{ message }}</h2>{% endfor %}
       {% endif %}
       <div class="col-5 border rounded flex-md-row shadow-sm border-dark" style="border-color: darkmagenta!important; background-color: palevioletred;">
         <form class="p-3" method="post" action="" id="SignIn">
           <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Post Title</label>
-            <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="My New Post!">
+            <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
           </div>
           <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label">Content of Your Post</label>
