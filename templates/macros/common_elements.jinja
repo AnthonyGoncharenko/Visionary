@@ -27,12 +27,12 @@
 {% endmacro %}
 
 {% macro postRail(posts) %}
-  <div class="col p-0 sticky-top">
-    <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5" style="background-color: red">
+  <div class="col p-0 sticky-top h-100">
+    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5 overflow-auto">
       <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, orange, chocolate);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Trending Posts</span>
       </div>
-      <div class="list-group list-group-flush border-bottom border-dark border-3">
+      <div class="list-group list-group-flush">
         {% for post in posts %}
           {{ minipost(post) }}
         {% endfor %}
@@ -42,12 +42,12 @@
 {% endmacro %}
 
 {% macro authorsTab(authors) %}
-  <div class="col p-0">
-    <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
+  <div class="col p-0 sticky-top h-100">
+    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5 overflow-auto">
       <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, magenta, darkmagenta);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Followed Authors</span>
       </div>
-      <div class="list-group list-group-flush border-bottom border-dark border-3">
+      <div class="list-group list-group-flush">
         {% for author in authors %}
           {{ author_info(author) }}
         {% endfor %}
@@ -57,12 +57,12 @@
 {% endmacro %}
 
 {% macro commentSection(comments) %}
-  <div class="col p-0 h-100 sticky-top">
-    <div class="d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
+  <div class="col p-0 sticky-top h-100">
+    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5 overflow-auto">
       <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, darkgrey, black);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Comments on this Post</span>
       </div>
-      <div class="list-group list-group-flush border-bottom border-dark border-3">
+      <div class="list-group list-group-flush">
         {% for comment_info in comments %}
           {{ comment(comment_info) }}
         {% endfor %}

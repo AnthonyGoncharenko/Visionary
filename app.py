@@ -64,7 +64,7 @@ def sign_in_page():
             session['user'] = username
             session['user_details'] = get_db().get_user(username)
             return redirect(url_for("home_page"))
-    return render_template("SignIn.html", form=form)
+    return render_template("SignIn.html", form=form, trending_posts=trending_posts())
 ########################################################################
 #                         END SIGN IN PAGE
 ########################################################################
@@ -93,7 +93,7 @@ def sign_up_page():
             print("REDIRECTING TO SIGN IN...")
 
             return redirect(url_for("sign_in_page"))
-    return render_template("SignUp.html", form=form)
+    return render_template("SignUp.html", form=form, trending_posts=trending_posts())
 ########################################################################
 #                         END SIGN UP PAGE
 ########################################################################
@@ -108,7 +108,7 @@ def make_post_page():
     if 'user' in session:
         form = PostForm()
         session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("MakePost.html", session=session, form=form)
+        return render_template("MakePost.html", session=session, form=form, trending_posts=trending_posts())
     else:
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
