@@ -22,6 +22,13 @@ def user_to_dict(user):
     m["posts"] = user[5]
     return m
 
+def image_to_dict(image):
+    m = {}
+    m["imid"] = image[0]
+    m["uid"] = image[1]
+    m["img"] = image[2]
+    return m
+
 def comment_to_dict(comment):
     m = {}
     m["user_id"] = comment[0]
@@ -152,9 +159,12 @@ class Database:
 
     def delete_post(self, pid):
         self.__execute("DELETE FROM posts where pid=?", [pid])
-
     def create_img(self, uid, img):
         self.__execute('INSERT INTO images (uid, img) VALUES (?, ?)', [uid, img])
+
+    def get_img(self, imid):
+        image = self.__select('SELECT * FROM images WHERE imid=?', [imid])[0]
+        return image_to_dict(image)
 
     def __get_img_id(self, uid, img):
         return self.__select('SELECT imid FROM images WHERE uid=? AND img=?', [uid, img])

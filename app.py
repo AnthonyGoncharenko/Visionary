@@ -7,9 +7,9 @@ from passlib.hash import pbkdf2_sha256
 
 from CommentForm import CommentForm
 from database import Database
+from PostForm import PostForm
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
-from PostForm import PostForm
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
@@ -135,10 +135,12 @@ def view_post_page():
 #                         DELETE POST PAGE
 ########################################################################
 
-@app.route('/delete/<int:pid>', methods=['POST'])
-def delete(pid):
-    delete_post(pid)
-    return redirect(url_for(request.referrer))
+@app.route('/delete', methods=['POST'])
+def delete_post():
+    if 'pid' in request.args:
+        pid = request.args['pid']
+        delete_post(pid)
+        return redirect(url_for(request.referrer))
 
 ########################################################################
 #                       END DELETE POST PAGE
@@ -148,10 +150,12 @@ def delete(pid):
 #                         FOLLOW AN AUTHOR
 ########################################################################
 
-@app.route('/follow_author/<int:pid>', methods=['POST'])
-def follow_author(pid):
-    follow(pid)
-    return redirect(url_for(request.referrer))
+@app.route('/follow_author/', methods=['POST'])
+def follow_author():
+    if 'pid' in request.args:
+        pid = request.args['pid']
+        follow(pid)
+        return redirect(url_for(request.referrer))
 
 ########################################################################
 #                       END FOLLOW AN AUTHOR
@@ -161,9 +165,10 @@ def follow_author(pid):
 #                         UNFOLLOW AN AUTHOR
 ########################################################################
 
-@app.route('/unfollow_author/<int:pid>', methods=['POST'])
-def unfollow_author(pid):
-    unfollow(pid)
+@app.route('/unfollow_author', methods=['POST'])
+def unfollow_author():
+    if 'pid' in request.args:
+        unfollow(requet.args['pid'])
     return redirect(url_for(request.referrer))
 
 ########################################################################
@@ -195,8 +200,8 @@ def followed_authors_page():
 ########################################################################
 #                           MAKE COMMENT PAGE
 ########################################################################
-@app.route('/make_comment/<int:pid>', methods=['GET', 'POST'])
-def make_comment_page(pid):
+@app.route('/make_comment', methods=['GET', 'POST'])
+def make_comment_page():
     if 'user' in session:
         session['user_details'] =  get_db().get_user(session['user'])
         form = CommentForm()
@@ -204,10 +209,28 @@ def make_comment_page(pid):
             return render_template("MakeComment.html", form=form, session=session)
         elif request.method == 'POST':
             if form.validate_on_submit():
-                get_db().create_comment(session['user_details']['user_id'], pid, request.form.get('content'))
+                if 'pid' in request.args:
+                    pid = request.args['pid']
+                    get_db().create_comment(session['user_details']['user_id'], pid, request.form.get('content'))
 
 ########################################################################
 #                         END MAKE COMMENT PAGE
+########################################################################
+
+########################################################################
+#                           PROFILE PAGE
+########################################################################
+
+@app.route('/profile', methods=['GET'])
+def profile_page():
+    if 'user' in session:
+        session['user_details'] =  get_db().get_user(session['user'])
+        if request.method == 'GET':
+            return render_template("Profile.html", session=session)
+
+
+########################################################################
+#                         END PROFILE PAGE
 ########################################################################
 
 
@@ -223,6 +246,7 @@ def logout_page():
 ########################################################################
 #                         END LOG OUT
 ########################################################################
+
 
 ########################################################################
 #                      DATABASE QUERYING
@@ -323,6 +347,7 @@ def unfollow(pid):
         db = get_db()
         uid = db.get_user(session['user'])["user_id"]
         db.unfollow(uid, pid)
+
 csrf.init_app(app)
 
 if __name__ == '__main__':
