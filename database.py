@@ -185,6 +185,13 @@ class Database:
                 new_followed = " ".join(followed)
                 self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
 
+    def unfollow(self, uid, pid):
+        if (user := self.get_user_by_uid(uid)) is not None:
+            followed = user["followed"].split(" ")
+            if str(pid) in followed:
+                followed.pop(followed.index(str(pid)))
+                new_followed = " ".join(followed)
+                self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
     def close(self):
         self.conn.close()
 

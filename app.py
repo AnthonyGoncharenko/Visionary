@@ -60,6 +60,7 @@ def sign_in_page():
             print("REDIRECT TO THE HOME PAGE...")
             username = request.form['username']
             session['user'] = username
+            session['user_details'] = get_db().get_user(username)
             return redirect(url_for("home_page"))
     return render_template("SignIn.html", form=form)
 ########################################################################
@@ -95,8 +96,6 @@ def sign_up_page():
 #                         END SIGN UP PAGE
 ########################################################################
 
-
-
 ########################################################################
 #                           MAKE POST PAGE
 ########################################################################
@@ -108,7 +107,59 @@ def post_page():
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
 ########################################################################
-#                         MAKE POST PAGE
+#                         END MAKE POST PAGE
+########################################################################
+
+########################################################################
+#                         VIEW POST PAGE
+########################################################################
+@app.route('/view_post/<int:pid>', methods=['GET'])
+def view_post_page(pid):
+    if request.method == 'GET':
+        return render_template("ViewPost.html", session=session, canDelete=canDelete(pid))
+    else:
+        return redirect(url_for('home_page'))
+########################################################################
+#                         END VIEW POST PAGE
+########################################################################
+
+########################################################################
+#                         DELETE POST PAGE
+########################################################################
+
+@app.route('/delete/<int:pid>', methods=['POST'])
+def delete(pid):
+    delete_post(pid)
+    return redirect(url_for(request.referrer))
+
+########################################################################
+#                       END DELETE POST PAGE
+########################################################################
+
+########################################################################
+#                         FOLLOW AN AUTHOR
+########################################################################
+
+@app.route('/follow_author/<int:pid>', methods=['POST'])
+def follow_author(pid):
+    follow(pid)
+    return redirect(url_for(request.referrer))
+
+########################################################################
+#                       END FOLLOW AN AUTHOR
+########################################################################
+
+########################################################################
+#                         UNFOLLOW AN AUTHOR
+########################################################################
+
+@app.route('/unfollow_author/<int:pid>', methods=['POST'])
+def unfollow_author(pid):
+    unfollow(pid)
+    return redirect(url_for(request.referrer))
+
+########################################################################
+#                       END UNFOLLOW AN AUTHOR
 ########################################################################
 
 ########################################################################
@@ -128,7 +179,7 @@ def authors_page():
 @app.route('/logout', methods=['POST'])
 def logout_page():
     if 'user' in session:
-        session.pop('user')
+        session.pop('user', None)
     return redirect(url_for('sign_in_page'))
 ########################################################################
 #                         END LOG OUT
@@ -207,18 +258,30 @@ def followed_posts():
         return [ post_to_dict(post) for post in posts ]
     return []
 
-def delete_post(pid):
+def canDelete(pid):
+    db = get_db()
     if 'user' in session:
-        if post := get_db().get_post_by_id(pid)['posts']:
-            if (user := get_db().get_user_by_id(post["uid"])) is not None:
+        if post := db.get_post_by_id(pid)['posts']:
+            if (user := db.get_user_by_id(post["uid"])) is not None:
                 if user['username'] == session['user']:
-                    get_db().delete_post(pid)
+                    return True
+    return False
+
+def delete_post(pid):
+    if canDelete(pid):
+        db.delete_post(pid)
+
 def follow(pid):
     if 'user' in session:
         db = get_db()
         uid = db.get_user(session['user'])["user_id"]
         db.follow(uid, pid)
 
+def unfollow(pid):
+    if 'user' in session:
+        db = get_db()
+        uid = db.get_user(session['user'])["user_id"]
+        db.unfollow(uid, pid)
 csrf.init_app(app)
 
 if __name__ == '__main__':
