@@ -32,8 +32,13 @@
             <li class="nav-link border-end border-5 border-dark author-tab {% if activePage == 2 %} {{ 'active' }} {% endif %}" ><a href="authors" class="nav-link px-2">Find Authors</a></li>
           </ul>
           <ul class="nav">
-            <li class="nav-link border-start border-5 border-dark login-tab {% if activePage == 3 %} {{ 'active' }} {% endif %}"><a href="signin" class="nav-link px-2">Login</a></li>
-            <li class="nav-link border-start border-5 border-dark signup-tab {% if activePage == 4 %} {{ 'active' }} {% endif %}"><a href="signup" class="nav-link px-2">Sign up</a></li>
+            {% if 'user' in session %}
+              <li class="nav-link border-start border-5 border-dark login-tab {% if activePage == 5 %} {{ 'active' }} {% endif %}"><a href="logout" class="nav-link px-2">Login</a></li>
+              <li class="nav-link border-start border-5 border-dark signup-tab {% if activePage == 6 %} {{ 'active' }} {% endif %}"><a href="profile" class="nav-link px-2">{{ session['user'] }}</a></li> 
+            {% else %}
+              <li class="nav-link border-start border-5 border-dark login-tab {% if activePage == 3 %} {{ 'active' }} {% endif %}"><a href="signin" class="nav-link px-2">Login</a></li>
+              <li class="nav-link border-start border-5 border-dark signup-tab {% if activePage == 4 %} {{ 'active' }} {% endif %}"><a href="signup" class="nav-link px-2">Sign up</a></li>  
+            {% endif %}
           </ul>
         </div>
       </nav>
