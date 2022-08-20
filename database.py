@@ -134,11 +134,12 @@ class Database:
         data = self.__select('SELECT * FROM users WHERE uid=?', [uid])
         if data:
             return user_to_dict(data[0])
+
     def create_post(self, username, title, content, img):
         if (user := self.get_user(username)) is None:
             return 
         self.create_img(user['user_id'], img)
-        imid = self.__get_img_id(user['user_id'], img)[0]
+        imid = self.__get_img_id(user['user_id'], img)[0][0]
         self.__execute('INSERT INTO posts (uid, title, content, imid) VALUES (?, ?, ?, ?)', [user['user_id'], title, content, imid])
 
         pid = self.__select("SELECT pid FROM posts WHERE uid=? AND title=? AND content=? AND imid=?", [user['user_id'], title, content, imid])
@@ -147,15 +148,16 @@ class Database:
         if str(pid) not in posts:
             posts.append(str(pid))
             new_posts = " ".join(posts)
-            self.__execute("UPDATE users SET posts=? WHERE uid=?", [new_posts, uid])
+            self.__execute("UPDATE users SET posts=? WHERE uid=?", [new_posts, user['user_id']])
 
     def delete_post(self, pid):
         self.__execute("DELETE FROM posts where pid=?", [pid])
+
     def create_img(self, uid, img):
         self.__execute('INSERT INTO images (uid, img) VALUES (?, ?)', [uid, img])
 
     def __get_img_id(self, uid, img):
-        return self.__select('SELECT FROM images WHERE uid=? AND img=?', [uid, img])
+        return self.__select('SELECT imid FROM images WHERE uid=? AND img=?', [uid, img])
 
     def get_posts_ids_by_author(self, author):
         data = self.__select('SELECT posts FROM users WHERE username=?', [author])

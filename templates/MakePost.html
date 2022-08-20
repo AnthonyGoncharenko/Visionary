@@ -20,21 +20,9 @@
       <div class="col-5 border rounded flex-md-row shadow-sm border-dark" style="border-color: darkmagenta!important; background-color: palevioletred;">
         <form class="p-3" method="post" action="">
             {{ form.csrf_token() }}
-            {{ displayField(form.post_title, autocomplete="off") }}
+            {{ displayField(form.post_title, 'My New Post!', autocomplete="off") }}
             {{ textField(form.post_content, rows=3, autocomplete="off") }}
             {{ imageField(form.post_image, accept=".png,.jpg", autocomplete="off") }}
-          <div class="mb-3">
-            <label for="exampleFormControlInput1" class="form-label">Post Title</label>
-            <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="My New Post!">
-          </div>
-          <div class="mb-3">
-            <label for="exampleFormControlTextarea1" class="form-label">Content of Your Post</label>
-            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="formFile" class="form-label">Default file input example</label>
-            <input class="form-control" type="file" id="formFile" accept=".png,.jpg">
-          </div>
           <button type="submit" class="btn" style="background-color: magenta; color:white;">Preview your Post</button>
         </form>
       </div>
