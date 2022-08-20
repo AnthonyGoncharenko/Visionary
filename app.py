@@ -5,6 +5,7 @@ from flask import (Flask, flash, g, redirect, render_template, request,
 from flask_wtf.csrf import CSRFProtect
 from passlib.hash import pbkdf2_sha256
 
+from CommentForm import CommentForm
 from database import Database
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
@@ -36,7 +37,7 @@ def get_db():
 def home_page():
     return render_template("Home.html", 
         session=session, 
-        followed_posts=followed_posts() if 'user' in session else [], 
+        followed_posts=followed_posts(), 
         trending_posts=trending_posts(), 
         recent_posts=recent_posts())
 ########################################################################
@@ -60,6 +61,7 @@ def sign_in_page():
             print("REDIRECT TO THE HOME PAGE...")
             username = request.form['username']
             session['user'] = username
+            session['user_details'] = get_db().get_user(username)
             return redirect(url_for("home_page"))
     return render_template("SignIn.html", form=form)
 ########################################################################
@@ -95,30 +97,113 @@ def sign_up_page():
 #                         END SIGN UP PAGE
 ########################################################################
 
-
-
 ########################################################################
 #                           MAKE POST PAGE
 ########################################################################
 @app.route('/makepost', methods=['GET', 'POST'])
 def make_post_page():
     if 'user' in session:
+        session['user_details'] =  get_db().get_user(session['user'])
         return render_template("MakePost.html", session=session)
     else:
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
 ########################################################################
-#                         MAKE POST PAGE
+#                         END MAKE POST PAGE
 ########################################################################
 
 ########################################################################
-#                           FIND AUTHORS PAGE
+#                         VIEW POST PAGE
+########################################################################
+@app.route('/view_post/<int:pid>', methods=['GET'])
+def view_post_page(pid):
+    if request.method == 'GET':
+        if 'user' in session:
+            session['user_details'] =  get_db().get_user(session['user'])
+        return render_template("ViewPost.html", session=session, canDelete=canDelete(pid))
+    else:
+        return redirect(url_for('home_page'))
+########################################################################
+#                         END VIEW POST PAGE
+########################################################################
+
+########################################################################
+#                         DELETE POST PAGE
+########################################################################
+
+@app.route('/delete/<int:pid>', methods=['POST'])
+def delete(pid):
+    delete_post(pid)
+    return redirect(url_for(request.referrer))
+
+########################################################################
+#                       END DELETE POST PAGE
+########################################################################
+
+########################################################################
+#                         FOLLOW AN AUTHOR
+########################################################################
+
+@app.route('/follow_author/<int:pid>', methods=['POST'])
+def follow_author(pid):
+    follow(pid)
+    return redirect(url_for(request.referrer))
+
+########################################################################
+#                       END FOLLOW AN AUTHOR
+########################################################################
+
+########################################################################
+#                         UNFOLLOW AN AUTHOR
+########################################################################
+
+@app.route('/unfollow_author/<int:pid>', methods=['POST'])
+def unfollow_author(pid):
+    unfollow(pid)
+    return redirect(url_for(request.referrer))
+
+########################################################################
+#                       END UNFOLLOW AN AUTHOR
+########################################################################
+
+########################################################################
+#                        FIND AUTHORS PAGE
 ########################################################################
 @app.route('/authors', methods=['GET', 'POST'])
 def authors_page():
     return render_template("FindAuthors.html")
 ########################################################################
-#                         FIND AUTHORS PAGE
+#                        END FIND AUTHORS PAGE
+########################################################################
+
+########################################################################
+#                           FOLLOWED AUTHORS PAGE
+########################################################################
+@app.route('/followed_authors', methods=['GET', 'POST'])
+def followed_authors_page():
+    if 'user' in session:
+        session['user_details'] =  get_db().get_user(session['user'])
+        return render_template("FollowedAuthors.html", session=session)
+########################################################################
+#                         END FOLLOWED AUTHORS PAGE
+########################################################################
+
+########################################################################
+#                           MAKE COMMENT PAGE
+########################################################################
+@app.route('/make_comment/<int:pid>', methods=['GET', 'POST'])
+def make_comment_page(pid):
+    if 'user' in session:
+        session['user_details'] =  get_db().get_user(session['user'])
+        form = CommentForm()
+        if request.method == 'GET':
+            return render_template("MakeComment.html", form=form, session=session)
+        elif request.method == 'POST':
+            if form.validate_on_submit():
+                get_db().create_comment(session['user_details']['user_id'], pid, request.form.get('content'))
+
+########################################################################
+#                         END MAKE COMMENT PAGE
 ########################################################################
 
 
@@ -128,7 +213,8 @@ def authors_page():
 @app.route('/logout', methods=['POST'])
 def logout_page():
     if 'user' in session:
-        session.pop('user')
+        session.pop('user_details', None)
+        session.pop('user', None)        
     return redirect(url_for('sign_in_page'))
 ########################################################################
 #                         END LOG OUT
@@ -150,6 +236,8 @@ def database_querying():
 
 
     if 'user' in session:
+        session['user_details'] =  get_db().get_user(session['user'])
+
         ...
 ########################################################################
 #                    END DATABASE QUERYING
@@ -207,18 +295,30 @@ def followed_posts():
         return [ post_to_dict(post) for post in posts ]
     return []
 
-def delete_post(pid):
+def canDelete(pid):
+    db = get_db()
     if 'user' in session:
-        if post := get_db().get_post_by_id(pid)['posts']:
-            if (user := get_db().get_user_by_id(post["uid"])) is not None:
+        if post := db.get_post_by_id(pid)['posts']:
+            if (user := db.get_user_by_id(post["uid"])) is not None:
                 if user['username'] == session['user']:
-                    get_db().delete_post(pid)
+                    return True
+    return False
+
+def delete_post(pid):
+    if canDelete(pid):
+        db.delete_post(pid)
+
 def follow(pid):
     if 'user' in session:
         db = get_db()
         uid = db.get_user(session['user'])["user_id"]
         db.follow(uid, pid)
 
+def unfollow(pid):
+    if 'user' in session:
+        db = get_db()
+        uid = db.get_user(session['user'])["user_id"]
+        db.unfollow(uid, pid)
 csrf.init_app(app)
 
 if __name__ == '__main__':

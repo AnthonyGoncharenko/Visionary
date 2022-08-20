@@ -22,6 +22,13 @@ def user_to_dict(user):
     m["posts"] = user[5]
     return m
 
+def comment_to_dict(comment):
+    m = {}
+    m["user_id"] = comment[0]
+    m["pid"] = comment[1]
+    m["content"] = comment[2]
+    return m
+
 class Database:
     def __init__(self, database_name):
         if not os.path.exists(database_name):
@@ -86,6 +93,23 @@ class Database:
         self.conn.commit()
         ###############################################
         #            END CREATE IMAGES TABLE
+        ###############################################    
+
+        ###############################################
+        #              CREATE COMMENTS TABLE
+        ###############################################        
+        c = self.conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS comments
+        (
+            uid INTEGER NOT NULL,
+            pid INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            FOREIGN KEY(uid) REFERENCES users(uid),
+            FOREIGN KEY(pid) REFERENCES posts(uid)
+        );''')
+        self.conn.commit()
+        ###############################################
+        #            END CREATE COMMENTS TABLE
         ###############################################        
         c.close()
 
@@ -183,6 +207,17 @@ class Database:
                 followed.append(str(pid))
                 new_followed = " ".join(followed)
                 self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
+
+    def unfollow(self, uid, pid):
+        if (user := self.get_user_by_uid(uid)) is not None:
+            followed = user["followed"].split(" ")
+            if str(pid) in followed:
+                followed.pop(followed.index(str(pid)))
+                new_followed = " ".join(followed)
+                self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
+
+    def create_comment(self, uid, pid, content):
+        self.__execute("INSERT INTO comments (uid, pid, content) VALUES (?, ?, ?)", [uid, pid, content])
 
     def close(self):
         self.conn.close()
