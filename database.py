@@ -32,7 +32,6 @@ class Database:
         print('I am Connected')
         print('------------------------------------------------------------')
         self.create()
-
     def create(self):
         ###############################################
         #              CREATE USERS TABLE
@@ -51,7 +50,7 @@ class Database:
         ###############################################
         #            END CREATE USERS TABLE
         ###############################################
-
+        
         ###############################################
         #              CREATE POSTS TABLE
         ###############################################
@@ -117,7 +116,7 @@ class Database:
         self.create_img(user['user_id'], img)
         imid = self.__get_img_id(user['user_id'], img)[0]
         self.__execute('INSERT INTO posts (uid, title, content, imid) VALUES (?, ?, ?, ?)', [user['user_id'], title, content, imid])
-        
+
         pid = self.__select("SELECT pid FROM posts WHERE uid=? AND title=? AND content=? AND imid=?", [user['user_id'], title, content, imid])
         posts = user["posts"].split(" ")
 
@@ -167,7 +166,7 @@ class Database:
 
     def get_n_followed_posts(self, username, n):
         data = self.__select("SELECT * FROM posts, ( SELECT followed FROM users where username=? ) WHERE posts.pid = followed ORDER BY posts.DATE LIMIT ?", [username, n])
-        
+
         return {
             'posts' : [post_to_dict(post) for post in data]
         }
@@ -176,7 +175,7 @@ class Database:
         return {
             'posts' : [post_to_dict(post) for post in data]
         }
-    
+
     def follow(self, uid, pid):
         if (user := self.get_user_by_uid(uid)) is not None:
             followed = user["followed"].split(" ")
@@ -187,4 +186,3 @@ class Database:
 
     def close(self):
         self.conn.close()
-

@@ -35,7 +35,7 @@ def get_db():
 @app.route('/home', methods=['GET', 'POST'])
 def home_page():
     return render_template("Home.html", 
-        session=session if 'user' in session else None, 
+        session=session, 
         followed_posts=followed_posts() if 'user' in session else [], 
         trending_posts=trending_posts(), 
         recent_posts=recent_posts())
@@ -100,8 +100,8 @@ def sign_up_page():
 ########################################################################
 #                           MAKE POST PAGE
 ########################################################################
-@app.route('/post', methods=['GET', 'POST'])
-def post_page():
+@app.route('/makepost', methods=['GET', 'POST'])
+def make_post_page():
     if 'user' in session:
         return render_template("MakePost.html", session=session)
     else:
