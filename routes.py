@@ -1,9 +1,19 @@
-from flask import (Blueprint, g, redirect, render_template, request, session, url_for)
+import asyncio
+import json
+import os
+from pprint import pprint
+from threading import Thread
+from time import sleep
+
+from flask import Blueprint, g, redirect, render_template, request, url_for, session
 from passlib.hash import pbkdf2_sha256
 
 from database import Database
+from DocumentUploadForm import DocumentUploadForm
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
+
+# backend = Blueprint('server', __name__)
 
 home = Blueprint('home', __name__, static_folder='static')
 signup = Blueprint('signup', __name__, static_folder='static')
@@ -42,10 +52,12 @@ def sign_in_page():
         if form.validate_on_submit():
             password = request.form['password']
             print("CHECKING THE DATABASE FOR THE USER DATA...")
-            if ((user := get_db().get_user(request.form['username'])) is None or 
-                    not pbkdf2_sha256.verify(password, user['encrypted_password'])):
-                print('USERNAME OR PASSWORD DOES NOT MATCH')
+            if (response := get_db().get_user(request.form['username'])) is None:
+                print('USER ALREADY EXISTS IN DATABASE')
                 return render_template("SignIn.html", form=SignInForm(), error_messages = ['USER DOES NOT EXIST IN DATABASE'])
+            if not pbkdf2_sha256.verify(password, response['encrypted_password']):
+                print('PASSWORD DOES NOT MATCH')
+                return render_template("SignIn.html", form=SignInForm(), error_messages = ['PASSWORD DOES NOT MATCH'])
             print("REDIRECT TO THE HOME PAGE...")
             username = request.form['username']
             session['user'] = username
@@ -70,13 +82,14 @@ def sign_up_page():
 
             if (response := get_db().get_user(request.form['username'])) is not None:
                 print('USER ALREADY EXISTS IN DATABASE...')
+                print('REDIRECTING TO SIGNUP')
                 return render_template("SignUp.html", form=SignUpForm(), error_messages = ['USER ALREADY EXISTS IN DATABASE'])
 
             print("ADDING USER TO THE DATABASE...")
 
             get_db().create_user(request.form['username'], encrypted_password, request.form['email'])
 
-            print("REDIRECTING TO SIGN IN...")
+            print("REDIRECTING TO THE SIGNIN...")
 
             return redirect(url_for("signin.sign_in_page"))
     return render_template("SignUp.html", form=form)
@@ -90,12 +103,7 @@ def sign_up_page():
 ########################################################################
 @home.route('/home', methods=['GET', 'POST'])
 def home_page():
-    return render_template("Home.html", 
-        session=session if 'user' in session else None, 
-        followed_posts=followed_posts() if 'user' in session else [], 
-        trending_posts=trending_posts(), 
-        recent_posts=recent_posts())
-   
+    return render_template("Home.html")
 ########################################################################
 #                         END HOME PAGE
 ########################################################################
@@ -106,8 +114,7 @@ def home_page():
 ########################################################################
 @home.route('/post', methods=['GET', 'POST'])
 def post_page():
-    if 'user' in session:
-        return render_template("MakePost.html", session=session)
+    return render_template("MakePost.html")
 ########################################################################
 #                         MAKE POST PAGE
 ########################################################################
@@ -136,80 +143,7 @@ def logout_page():
 #                         END LOG OUT
 ########################################################################
 
-########################################################################
-#                      DATABASE QUERYING
-########################################################################
-@home.route('/api/db/', methods=['GET', 'POST', 'DELETE'])
-def database_querying():
-    #TODO
-    
-    if request.method == 'GET':
-        ...
-    elif request.method == 'POST':
-        ...
-    elif request.method == 'DELETE':
-        ...
 
-
-    if 'user' in session:
-        ...
-########################################################################
-#                    END DATABASE QUERYING
-########################################################################
-
-
-
-def post_to_dict(post):
-    m = {}
-    m['pid'] = post['pid']
-    m['author'] = post['author']
-    m['title'] = post['title']
-    m['data'] = post['data']
-    return m
-
-def trending_posts():
-    """
-    trending_posts Get top 10 posts from the database, and return them in a list
-
-    :return: List of Post dictionaries
-    :rtype: List[dict]
-    """ 
-    posts = get_db().get_n_trending_posts(10)['posts']
-    return [ post_to_dict(post) for post in posts ]
-    
-def recent_posts():
-    """
-    recent_posts Get 10 most recent posts from the database, and return them in a list
-
-    :return: List of Post dictionaries
-    :rtype: List[dict]
-    """    
-    posts = get_db().get_n_recent_posts(10)['posts']
-    return [ post_to_dict(post) for post in posts ]
-
-def followed_posts():
-    """
-    followed_posts Get 10 newest posts from followed authors
-
-    :return: List of Post dictionaries
-    :rtype: List[dict]
-    """    
-    if 'user' in session:
-        posts = get_db().get_n_followed_posts(session['user'], 10)['posts']
-        return [ post_to_dict(post) for post in posts ]
-    return []
-
-def delete_post(pid):
-    if 'user' in session:
-        if post := get_db().get_post_by_id(pid)['posts']:
-            if (user := get_db().get_user_by_id(post["uid"])) is not None:
-                if user['username'] == session['user']:
-                    get_db().delete_post(pid)
-def follow(pid):
-    if 'user' in session:
-        db = get_db()
-        uid = db.get_user(session['user'])["user_id"]
-        db.follow(uid, pid)
 
 # @home.route('/')
 # @home.route('/home')
