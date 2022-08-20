@@ -9,6 +9,8 @@ from CommentForm import CommentForm
 from database import Database
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
+from PostUpload import PostUpload
+
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
@@ -100,14 +102,33 @@ def sign_up_page():
 ########################################################################
 #                           MAKE POST PAGE
 ########################################################################
+
 @app.route('/makepost', methods=['GET', 'POST'])
-def make_post_page():
-    if 'user' in session:
-        session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("MakePost.html", session=session)
+def post_page():
+    if request.method == 'POST':
+        print("IN make post: PUT request",request.form['blog_title'],request.form['blog'])
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            print('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '': 
+            print('No selected file')
+            return redirect(request.url)
+        #if file and allowed_file(file.filename):
+        if file:
+            filename = file.filename
+            print("File name is:",filename)
+            #filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     else:
-        flash("SIGN IN FIRST BEFORE MAKING A POST!!")
-        return redirect(url_for('sign_in_page'))
+        print("IN make post: Get request")
+    if 'user' in session:
+        form = PostUpload()
+        return render_template("MakePost.html",form=form,session=session)
+
 ########################################################################
 #                         END MAKE POST PAGE
 ########################################################################
