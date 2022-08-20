@@ -142,16 +142,15 @@ class Database:
         if data:
             return user_to_dict(data[0])
 
-    def create_post(self, username, title, content, img):
+    def create_post(self, username, title, content, img, date):
         if (user := self.get_user(username)) is None:
             return 
         self.create_img(user['user_id'], img)
         imid = self.__get_img_id(user['user_id'], img)[0][0]
-        self.__execute('INSERT INTO posts (uid, title, content, imid) VALUES (?, ?, ?, ?)', [user['user_id'], title, content, imid])
+        self.__execute('INSERT INTO posts (uid, title, content, imid, date) VALUES (?, ?, ?, ?, ?)', [user['user_id'], title, content, imid, date])
 
-        pid = self.__select("SELECT pid FROM posts WHERE uid=? AND title=? AND content=? AND imid=?", [user['user_id'], title, content, imid])
+        pid = self.__select("SELECT pid FROM posts WHERE uid=? AND title=? AND content=? AND imid=?", [user['user_id'], title, content, imid])[0][0]
         posts = user["posts"].split(" ")
-
         if str(pid) not in posts:
             posts.append(str(pid))
             new_posts = " ".join(posts)
@@ -173,19 +172,22 @@ class Database:
         data = self.__select('SELECT posts FROM users WHERE username=?', [author])
         if data:
             return {
-                'pids' : data[0]
+                'pids' : data[0][0]
             }
 
     def get_posts_from_author(self, author):
-        if (post_ids := self.get_posts_ids_by_author(author)) is None:
-            return
+        post_ids = self.get_posts_ids_by_author(author)['pids'].split(" ")
         res = []
+        
         for pid in post_ids:
+            if pid == '':
+                continue
             post = self.__select('SELECT * FROM posts where pid=?', [pid])[0]
             res.append(post_to_dict(post))
         return { 
             'posts' : res
          }
+
     def get_n_trending_posts(self, n):
         data = self.__select('SELECT * FROM posts ORDER BY clicks LIMIT ?', [n])
 

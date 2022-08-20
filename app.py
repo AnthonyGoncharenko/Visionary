@@ -217,17 +217,30 @@ def make_comment_page():
 #                         END MAKE COMMENT PAGE
 ########################################################################
 
+
 ########################################################################
 #                           PROFILE PAGE
 ########################################################################
 
 @app.route('/profile', methods=['GET'])
 def profile_page():
-    if 'user' in session:
-        session['user_details'] =  get_db().get_user(session['user'])
-        if request.method == 'GET':
-            return render_template("Profile.html", session=session)
+    if request.method == 'GET':
+        db = get_db()
 
+        if 'uid' in request.args:
+            user = db.get_user_by_uid(request.args['uid'])
+            posts=db.get_posts_from_author(user['username']['posts'])
+            return render_template("Profile.html", user=user, session=session, posts=posts)
+
+        elif 'user' in session:
+            session['user_details'] = db.get_user(session['user'])
+            posts = db.get_posts_from_author(session['user'])['posts']
+            user = db.get_user_by_uid(session['user_details']['user_id'])
+            print(posts)
+            return render_template("Profile.html", user=user, session=session, posts=posts)
+        else:
+            return redirect(url_for('sign_in_page'))
+    
 
 ########################################################################
 #                         END PROFILE PAGE
