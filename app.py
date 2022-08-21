@@ -1,16 +1,16 @@
 import os
 
-from flask import (Flask, flash, g, redirect, render_template, request,
-                   session, url_for)
+from flask import (Flask, flash, g, jsonify, redirect, render_template,
+                   request, session, url_for)
 from flask_wtf.csrf import CSRFProtect
 from passlib.hash import pbkdf2_sha256
 
+from AuthorForm import AuthorForm
 from CommentForm import CommentForm
 from database import Database
 from PostForm import PostForm
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
-from AuthorForm import AuthorForm
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
@@ -255,6 +255,52 @@ def profile_page():
 ########################################################################
 #                         END PROFILE PAGE
 ########################################################################
+
+########################################################################
+#                           TESTING
+########################################################################
+@app.route('/<string:usr>/<int:n>', methods=['GET'])
+def testing(usr, n):
+    import datetime
+    import os 
+    
+    database_name = "visionary_database.db"
+    if os.path.exists(database_name):
+        os.remove(database_name)
+    
+    with open(database_name, 'wb'):
+        ...
+    
+    get_db().create_user('amg568', 'definitely encrypted', 'amg568@gmail.com')
+    get_db().create_user('jeff69420', 'definitely encrypted', 'jeff69@gmail.com')
+    get_db().create_user('elizbeth', 'definitely encrypted', 'elizabeth+netflix@gmail.com')
+    
+    session['user'] = 'amg568'
+    session['user_details']= get_db().get_user(session['user'])
+
+
+    get_db().create_post('jeff69420', 'jeff\'s first post', 'my favorite color is pink', 'test.jog', datetime.datetime.now())
+    get_db().create_post('jeff69420', 'jeff\'s second post', 'my second favorite color is orange', 'test2.jog', datetime.datetime.now())
+    get_db().create_post('elizbeth', 'I am the queen of england', 'I love my dogs <3', 'test2.jog', datetime.datetime.now())
+
+    follow(session['user_details']['user_id'] + 1)
+    follow(session['user_details']['user_id'] + 2)
+    ant = {'ant' : get_db().get_user('amg568')}
+
+    data = {'data' :  get_db().get_n_followed_posts(usr, n)}
+    unfollow(session['user_details']['user_id'] + 1)
+    unfollow(session['user_details']['user_id'] + 2)
+    get_db().delete_user('jeff69420')
+    get_db().delete_user('amg568')
+    session.pop('user', None)
+    session.pop('user_details', None)
+    return jsonify(ant, data)
+########################################################################
+#                         END TESTING
+########################################################################
+
+
+
 
 
 ########################################################################
