@@ -18,8 +18,8 @@ def user_to_dict(user):
     m["username"] = user[1]
     m["encrypted_password"] = user[2]
     m["email"] = user[3]
-    m["followed"] = user[4]
-    m["posts"] = user[5]
+    m["followed"] = [] if user[4] == '' else list(map(int, user[4].strip().split(" ")))
+    m["posts"] = [] if user[5] == '' else list(map(int, user[5].strip().split(" ")))
     return m
 
 def image_to_dict(image):
@@ -35,7 +35,8 @@ def comment_to_dict(comment):
     m["pid"] = comment[1]
     m["content"] = comment[2]
     return m
-
+def string_list_to_list(s):
+    return s.strip().split(" ")
 class Database:
     def __init__(self, database_name):
         if not os.path.exists(database_name):
@@ -153,10 +154,10 @@ class Database:
         self.__execute('INSERT INTO posts (uid, title, content, imid, date) VALUES (?, ?, ?, ?, ?)', [user['user_id'], title, content, imid, date])
 
         pid = self.__select("SELECT pid FROM posts WHERE uid=? AND title=? AND content=? AND imid=?", [user['user_id'], title, content, imid])[0][0]
-        posts = user["posts"].split(" ")
-        if str(pid) not in posts:
-            posts.append(str(pid))
-            new_posts = " ".join(posts)
+        posts = user["posts"]
+        if pid not in (s := set(posts)):
+            s.add(pid)
+            new_posts = " ".join(list(map(str, s)))
             self.__execute("UPDATE users SET posts=? WHERE uid=?", [new_posts, user['user_id']])
 
     def delete_post(self, pid):
@@ -174,23 +175,20 @@ class Database:
     
     def click_on_post(self, pid):
         clicks = self.__select("SELECT clicks FROM posts WHERE pid=?", [pid])[0][0]
-        print(clicks)
         self.__execute("UPDATE posts SET clicks=? WHERE pid=?", [clicks+1, pid])
 
     def get_posts_ids_by_author(self, author):
         data = self.__select('SELECT posts FROM users WHERE username=?', [author])
         if data:
             return {
-                'pids' : data[0][0]
+                'pids' : string_list_to_list(data[0][0])
             }
 
     def get_posts_from_author(self, author):
-        post_ids = self.get_posts_ids_by_author(author)['pids'].split(" ")
+        post_ids = self.get_posts_ids_by_author(author)['pids']
         res = []
         
         for pid in post_ids:
-            if pid == '':
-                continue
             post = self.__select('SELECT * FROM posts where pid=?', [pid])[0]
             res.append(post_to_dict(post))
         return { 
@@ -238,20 +236,18 @@ class Database:
 
     def follow(self, uid, pid):
         if (user := self.get_user_by_uid(uid)) is not None:
-            followed = user["followed"].split(" ")
-            if "" in followed:
-                followed.pop(followed.index(""))
-            if str(pid) not in followed:
-                followed.append(str(pid))
-                new_followed = " ".join(followed)
+            followed = user["followed"]
+            if pid not in (s := set(followed)):
+                s.add(pid)
+                new_followed = " ".join(list(map(str, s)))
                 self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
 
     def unfollow(self, uid, pid):
         if (user := self.get_user_by_uid(uid)) is not None:
-            followed = user["followed"].split(" ")
-            if str(pid) in followed:
-                followed.pop(followed.index(str(pid)))
-                new_followed = " ".join(followed)
+            followed = user["followed"]
+            if pid in (s := set(followed)):
+                s.remove(pid)
+                new_followed = " ".join(list(map(str, s)))
                 self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
 
     def create_comment(self, uid, pid, content):
