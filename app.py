@@ -259,8 +259,8 @@ def profile_page():
 ########################################################################
 #                           TESTING
 ########################################################################
-@app.route('/<int:n1>/<int:n2>', methods=['GET'])
-def testing(n1,n2):
+@app.route('/<int:n1>', methods=['GET'])
+def testing(n1):
     import datetime
     import os 
     
@@ -285,9 +285,7 @@ def testing(n1,n2):
 
     follow(session['user_details']['user_id'] + 1)
     follow(session['user_details']['user_id'] + 2)
-    get_db().follow(n1, n2)
-    get_db().follow(n2, n1)
-    # ant = {'ant' : get_db().get_user('amg568')}
+    ant = {'ant' : get_db().get_user('amg568')}
     get_db().click_on_post(1)
     get_db().click_on_post(1)
     get_db().click_on_post(1)
@@ -300,16 +298,17 @@ def testing(n1,n2):
     get_db().click_on_post(3)
     get_db().click_on_post(3)
     get_db().click_on_post(3)
-    data = {'data' :  get_db().get_user_by_uid(n1)}
-    data2 = {'data' :  get_db().get_user_by_uid(n2)}
+    get_db().delete_post(n1)
+    data = {'data' :  get_db().get_posts_from_author(get_db().get_user_by_uid(n1)["username"])}
     unfollow(session['user_details']['user_id'] + 1)
     unfollow(session['user_details']['user_id'] + 2)
+    ant2 = {'ant' : get_db().get_user('amg568')}
     get_db().delete_user('jeff69420')
     get_db().delete_user('amg568')
     get_db().delete_user('elizbeth')
     session.pop('user', None)
     session.pop('user_details', None)
-    return jsonify(data, data2)
+    return jsonify(data, ant, ant2)
 ########################################################################
 #                         END TESTING
 ########################################################################

@@ -35,6 +35,7 @@ def comment_to_dict(comment):
     m["pid"] = comment[1]
     m["content"] = comment[2]
     return m
+
 def string_list_to_list(s):
     return s.strip().split(" ")
 class Database:
@@ -141,6 +142,7 @@ class Database:
         data = self.__select('SELECT * FROM users WHERE username=?', [username])
         if data:
             return user_to_dict(data[0])
+
     def get_user_by_uid(self, uid):
         data = self.__select('SELECT * FROM users WHERE uid=?', [uid])
         if data:
@@ -187,10 +189,12 @@ class Database:
     def get_posts_from_author(self, author):
         post_ids = self.get_posts_ids_by_author(author)['pids']
         res = []
-        
         for pid in post_ids:
-            post = self.__select('SELECT * FROM posts where pid=?', [pid])[0]
-            res.append(post_to_dict(post))
+            if pid == '':
+                continue
+            post = self.__select('SELECT * FROM posts where pid=?', [pid])
+            if len(post) > 0:
+                res.append(post_to_dict(post[0]))
         return { 
             'posts' : res
          }
