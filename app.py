@@ -132,7 +132,8 @@ def handle_image(request, user):
         new_filename = f'{imid}{os.path.splitext(filename)[1]}'
         save_dir = os.path.join( dirname, new_filename)
         file.save(save_dir)
-        return save_dir
+        get_db().update_img(imid, save_dir)
+        return str(imid)
     else:
         return "-1"
 
@@ -151,11 +152,9 @@ def make_post_page():
         user = session['user']
         if request.method == 'POST':
             if 'file' in request.files:
-                save_dir = handle_image(request, user)
-                imid = os.path.splitext(save_dir)[0]
-                return imid
+                imid = handle_image(request, user)
                 get_db().create_post(user, request.form['post_title'], request.form['post_content'], imid, datetime.datetime.now() )
-                return redirect(save_dir)
+                return redirect(url_for('home_page'))
         elif request.method == 'GET':
             form = PostForm()
             session['user_details'] =  get_db().get_user(user)

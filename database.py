@@ -166,7 +166,8 @@ class Database:
 
     def create_img(self, uid, img):
         self.__execute('INSERT INTO images (uid, img) VALUES (?, ?)', [uid, img])
-
+    def update_img(self, imid, new_name):
+            self.__execute("UPDATE images SET img=? WHERE imid=?", [new_name, imid])
     def get_img(self, imid):
         image = self.__select('SELECT * FROM images WHERE imid=?', [imid])
         return image_to_dict(image[0])
@@ -196,6 +197,7 @@ class Database:
             if len(post) > 0:
                 v = post_to_dict(post[0])
                 v["author"] = self.get_user_by_uid(v["uid"])['username']
+                v["img_path"] = self.get_img(v['imid'])['img']
                 res.append(v)
         return { 
             'posts' : res
@@ -207,6 +209,8 @@ class Database:
         for post in posts:
             v = post_to_dict(post)
             v["author"] = self.get_user_by_uid(v["uid"])['username']
+            v["img_path"] = self.get_img(v['imid'])['img']
+
             res.append(v)
 
         return {
@@ -220,6 +224,8 @@ class Database:
         for post in posts:
             v = post_to_dict(post)
             v["author"] = self.get_user_by_uid(v["uid"])['username']
+            v["img_path"] = self.get_img(v['imid'])['img']
+
             res.append(v)
 
         return {
@@ -233,6 +239,8 @@ class Database:
         for post in posts:
             v = post_to_dict(post)
             v["author"] = self.get_user_by_uid(v["uid"])['username']
+            v["img_path"] = self.get_img(v['imid'])['img']
+        
             res.append(v)
 
         return {
@@ -260,6 +268,8 @@ class Database:
         for post in posts:
             v = post_to_dict(post)
             v["author"] = self.get_user_by_uid(v["uid"])['username']
+            v["img_path"] = self.get_img(v['imid'])['img']
+
             res.append(v)
 
         return {
