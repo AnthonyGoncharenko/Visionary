@@ -4,6 +4,7 @@ from flask import (Flask, flash, g, redirect, render_template, request,
                    session, url_for)
 from flask_wtf.csrf import CSRFProtect
 from passlib.hash import pbkdf2_sha256
+import datetime
 
 from CommentForm import CommentForm
 from database import Database
@@ -109,11 +110,15 @@ def sign_up_page():
 @app.route('/makepost', methods=['GET', 'POST'])
 def make_post_page():
     if 'user' in session and request.method == 'POST':
-        get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], request.form['post_image'])
+        get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], request.form['post_image'], datetime.datetime.now())
     if 'user' in session:
         form = PostForm()
         session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("MakePost.html", session=session, form=form, trending_posts=trending_posts())
+        return render_template(
+            "MakePost.html", 
+            session=session, 
+            form=form, 
+            trending_posts=trending_posts())
     else:
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
@@ -128,7 +133,7 @@ def make_post_page():
 def view_post_page():
     return render_template("ViewPost.html",
         session=session,
-        postId = request.args.get('post_id'),
+        post = get_db().get_post_by_id(request.args.get('post_id'))['posts'][0],
         canDelete=canDelete(request.args.get('post_id')),
         form=CommentForm())
 
@@ -354,8 +359,10 @@ def followed_posts():
 def canDelete(pid):
     db = get_db()
     if 'user' in session:
-        if post := db.get_post_by_id(pid)['posts']:
-            if (user := db.get_user_by_id(post["uid"])) is not None:
+        print(session)
+        if post := db.get_post_by_id(pid)['posts'][0]:
+            print(post)
+            if (user := db.get_user_by_uid(post["uid"])) is not None:
                 if user['username'] == session['user']:
                     return True
     return False

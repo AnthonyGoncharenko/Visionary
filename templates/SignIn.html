@@ -13,10 +13,12 @@
     <div class="col-8 p-0 lime-background mb-auto h-100">
       <div class="p-5 overflow-auto container-fluid">
         <h1 class="SignInheader">Sign In</h1>
-        {% if error_messages %}
-          <p class="mb-0">Sorry... We ran into some problems:</p>
-          {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
-        {% endif %}
+        {% with error_messages = get_flashed_messages() %}
+          {% if error_messages %}
+            <p class="mb-0">Sorry... We ran into some problems:</p>
+            {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
+          {% endif %}
+        {% endwith %}
         <div class="col-5 border rounded flex-md-row shadow-sm border-dark lime-menu">
           <form class="p-3" method="post" action="" id="SignIn">
             {{ form.csrf_token() }}
