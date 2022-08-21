@@ -18,6 +18,16 @@
   </div>
 {% endmacro %}
 
+{% macro commentTextField(fieldName, placeHolderValue) %}
+  <div class="mb-3">
+    {{ fieldName.label(class="form-label montserrat-white") }} {{ fieldName(class="form-control", placeholder=placeHolderValue, **kwargs) }}
+    <!-- Error Messages -->
+    <ul>
+      {% for error in fieldName.errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+  </div>
+{% endmacro %}
+
 {% macro imageField(fieldName) %}
   <div class="mb-3">
     {{ fieldName.label(class="form-label") }} {{ fieldName(class="form-control", placeholder=placeHolderValue, **kwargs) }}
