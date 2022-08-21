@@ -13,6 +13,7 @@ from database import Database
 from PostForm import PostForm
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
+from AuthorForm import AuthorForm
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
@@ -42,11 +43,15 @@ def get_db():
 ########################################################################
 @app.route('/home', methods=['GET', 'POST'])
 def home_page():
+    if 'page' in request.args:
+        n = int(request.args['page'])
+    else:
+        n = 1
     return render_template("Home.html", 
         session=session, 
         followed_posts=followed_posts(), 
         trending_posts=trending_posts(), 
-        recent_posts=recent_posts())
+        recent_posts=pagination(n))
 ########################################################################
 #                         END HOME PAGE
 ########################################################################
@@ -70,7 +75,7 @@ def sign_in_page():
             session['user'] = username
             session['user_details'] = get_db().get_user(username)
             return redirect(url_for("home_page"))
-    return render_template("SignIn.html", form=form)
+    return render_template("SignIn.html", form=form, trending_posts=trending_posts())
 ########################################################################
 #                         END SIGN IN PAGE
 ########################################################################
@@ -99,7 +104,7 @@ def sign_up_page():
             print("REDIRECTING TO SIGN IN...")
 
             return redirect(url_for("sign_in_page"))
-    return render_template("SignUp.html", form=form)
+    return render_template("SignUp.html", form=form, trending_posts=trending_posts())
 ########################################################################
 #                         END SIGN UP PAGE
 ########################################################################
@@ -156,7 +161,7 @@ def make_post_page():
     if 'user' in session:
         form = PostForm()
         session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("MakePost.html", session=session, form=form)
+        return render_template("MakePost.html", session=session, form=form, trending_posts=trending_posts())
     else:
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
@@ -169,12 +174,12 @@ def make_post_page():
 ########################################################################
 @app.route('/view_post', methods=['GET'])
 def view_post_page():
-    if request.method == 'GET' :
-        if 'user' in session:
-            session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("ViewPost.html", session=session, postId = request.args.get('post_id'), canDelete=canDelete(request.args.get('post_id')))
-    else:
-        return redirect(url_for('home_page'))
+    return render_template("ViewPost.html",
+        session=session,
+        postId = request.args.get('post_id'),
+        canDelete=canDelete(request.args.get('post_id')),
+        form=CommentForm())
+
 ########################################################################
 #                         END VIEW POST PAGE
 ########################################################################
@@ -228,7 +233,8 @@ def unfollow_author():
 ########################################################################
 @app.route('/authors', methods=['GET', 'POST'])
 def authors_page():
-    return render_template("FindAuthors.html")
+    form = AuthorForm()
+    return render_template("FindAuthors.html", form=form)
 ########################################################################
 #                        END FIND AUTHORS PAGE
 ########################################################################
@@ -240,7 +246,12 @@ def authors_page():
 def followed_authors_page():
     if 'user' in session:
         session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("FollowedAuthors.html", session=session)
+        return render_template(
+            "FollowedAuthors.html", 
+            session=session,
+            followed_posts= get_followed_posts(),
+            followed = get_followed(),
+            form = AuthorForm())
 ########################################################################
 #                         END FOLLOWED AUTHORS PAGE
 ########################################################################
@@ -250,16 +261,11 @@ def followed_authors_page():
 ########################################################################
 @app.route('/make_comment', methods=['GET', 'POST'])
 def make_comment_page():
-    if 'user' in session:
-        session['user_details'] =  get_db().get_user(session['user'])
-        form = CommentForm()
-        if request.method == 'GET':
-            return render_template("MakeComment.html", form=form, session=session)
-        elif request.method == 'POST':
-            if form.validate_on_submit():
-                if 'pid' in request.args:
-                    pid = request.args['pid']
-                    get_db().create_comment(session['user_details']['user_id'], pid, request.form.get('content'))
+    if 'user' in session and request.method == 'POST':
+        if form.validate_on_submit():
+            if 'pid' in request.args:
+                pid = request.args['pid']
+                get_db().create_comment(session['user']['uid'], request.args.get('post_id'), request.form['comment_content'])
 
 ########################################################################
 #                         END MAKE COMMENT PAGE
@@ -284,15 +290,21 @@ def profile_page():
             session['user_details'] = db.get_user(session['user'])
             posts = db.get_posts_from_author(session['user'])['posts']
             user = db.get_user_by_uid(session['user_details']['user_id'])
-            print(posts)
-            return render_template("Profile.html", user=user, session=session, posts=posts)
+            return render_template(
+                "Profile.html", 
+                user=user, 
+                session=session, 
+                posts=posts, 
+                followed=get_followed(),
+                form=AuthorForm())
         else:
             return redirect(url_for('sign_in_page'))
-    
 
 ########################################################################
 #                         END PROFILE PAGE
 ########################################################################
+
+
 
 
 ########################################################################
@@ -361,16 +373,19 @@ def trending_posts():
     """ 
     posts = get_db().get_n_trending_posts(10)['posts']
     return [ post_to_dict(post) for post in posts ]
-    
-def recent_posts():
+
+def recent_posts(n):
     """
-    recent_posts Get 10 most recent posts from the database, and return them in a list
+    recent_posts Get n most recent posts from the database, and return them in a list
 
     :return: List of Post dictionaries
     :rtype: List[dict]
     """    
-    posts = get_db().get_n_recent_posts(10)['posts']
+    posts = get_db().get_n_recent_posts(n)['posts']
     return [ post_to_dict(post) for post in posts ]
+
+def pagination(n):
+    return recent_posts(n * 10)[(n-1)*10:n*10]
 
 def followed_posts():
     """
@@ -408,6 +423,18 @@ def unfollow(pid):
         db = get_db()
         uid = db.get_user(session['user'])["user_id"]
         db.unfollow(uid, pid)
+def get_followed():
+    if 'user' in session:
+        db = get_db()
+        session['user_details'] = db.get_user(session['user'])
+        followed = session['user_details']['followed']
+        followed = [db.get_user_by_uid(int(follow)) for follow in followed if follower != ""]
+        return followed
+    else:
+        return []
+
+def get_followed_posts():
+    return []
 
 csrf.init_app(app)
 

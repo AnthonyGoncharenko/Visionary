@@ -10,9 +10,9 @@
 </head>
 {% block content %}
   <div class="row m-0 h-100">
-    <div class="col-8 p-0">
+    <div class="col-8 p-0 h-100">
       {{ postfeed(recent_posts) }}
     </div>
-    {{ postRail() }}
+    {{ postRail(trending_posts) }}
   </div>
 {% endblock content %}
