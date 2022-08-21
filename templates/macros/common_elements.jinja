@@ -1,92 +1,82 @@
 {% from "form_helper.html" import commentTextField, displayField %}
-
 {% macro postfeed(posts) %}
   <div class="px-5 overflow-auto container crimson-background h-100"">
-    {% for post_info in posts %}
-        {{ post(post_info) }}
-    {% endfor %}
+    {% for post_info in posts %}{{ post(post_info) }}{% endfor %}
   </div>
 {% endmacro %}
-
 {% macro author_postfeed(author_posts) %}
   <div class="px-5 overflow-auto container orange-background h-100"">
-    {% for post_info in author_posts %}
-        {{ post(post_info) }}
-    {% endfor %}
+    {% for post_info in author_posts %}{{ post(post_info) }}{% endfor %}
   </div>
 {% endmacro %}
-
 {% macro post(post_info) %}
   <div class="p-5 m-5 blog-backing">
     <div class="mb-3 d-flex justify-content-center">
-      <img id="PostImage" src="/get_image?imid={{ post_info.image }}" >
+      <img id="PostImage" src="{{ post_info.img_path }}">
     </div>
     <div>
       <h2 id="PostHeader" class="text-wrap text-break">{{ post_info.title }}</h2>
-      <p class="text-wrap text-break montserrat"> {{ post_info.content }} </p>
+      <p class="text-wrap text-break montserrat">{{ post_info.content }}</p>
     </div>
   </div>
 {% endmacro %}
-
 {% macro postRail(posts) %}
   <div class="col p-0 sticky-top h-100">
     <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
-      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, orange, chocolate);">
+      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5"
+           style="background-image: linear-gradient(180deg, orange, chocolate);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Trending Posts</span>
       </div>
       <div class="list-group list-group-flush overflow-auto">
-        {% for post in posts %}
-          {{ minipost(post) }}
-        {% endfor %}
+        {% for post in posts %}{{ minipost(post) }}{% endfor %}
       </div>
     </div>
   </div>
 {% endmacro %}
-
 {% macro authorsTab(authors, form) %}
   <div class="col p-0 sticky-top h-100">
     <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
-      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, magenta, darkmagenta);">
+      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5"
+           style="background-image: linear-gradient(180deg, magenta, darkmagenta);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Followed Authors</span>
       </div>
-      <div class="overflow-auto m-0 list-group list-group-flush h-75" style="background-color: mediumorchid">
-        {% for author in authors %}
-          {{ author_info(author) }}
-        {% endfor %}
+      <div class="overflow-auto m-0 list-group list-group-flush h-75"
+           style="background-color: mediumorchid">
+        {% for author in authors %}{{ author_info(author) }}{% endfor %}
       </div>
-      <div class="p-3 m-0 h-25 border-top border-5 border-dark" style="background-color: darkmagenta;">
-          <form class="p-2" method="post" action="make_comment">
-            {{ form.csrf_token() }}
-            {{ commentTextField(form.author_name, 'username', autocomplete="off") }}
-            <button type="submit" class="btn" style="background-color: magenta;">Submit</button>
-          </form>
+      <div class="p-3 m-0 h-25 border-top border-5 border-dark"
+           style="background-color: darkmagenta;">
+        <form class="p-2" method="post" action="make_comment">
+          {{ form.csrf_token() }}
+          {{ commentTextField(form.author_name, 'username', autocomplete="off") }}
+          <button type="submit" class="btn" style="background-color: magenta;">Submit</button>
+        </form>
       </div>
     </div>
   </div>
 {% endmacro %}
-
 {% macro commentSection(comments, form) %}
   <div class="col p-0 sticky-top h-100">
     <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
-      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, darkgrey, black);">
+      <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5"
+           style="background-image: linear-gradient(180deg, darkgrey, black);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Comments on this Post</span>
       </div>
-      <div class="overflow-auto m-0 list-group list-group-flush h-75" style="background-color: gray">
-        {% for comment_info in comments %}
-          {{ comment(comment_info) }}
-        {% endfor %}
+      <div class="overflow-auto m-0 list-group list-group-flush h-75"
+           style="background-color: gray">
+        {% for comment_info in comments %}{{ comment(comment_info) }}{% endfor %}
       </div>
-      <div class="p-3 m-0 h-25 border-top border-5 border-dark" style="background-color: black;">
-          <form class="p-2" method="post" action="make_comment_page">
-            {{ form.csrf_token() }}
-            {{ commentTextField(form.comment_content, 'Let the author know what you think!', autocomplete="off") }}
-            <button type="submit" class="btn" style="background-color: gold;">Submit</button>
-          </form>
+      <div class="p-3 m-0 h-25 border-top border-5 border-dark"
+           style="background-color: black;">
+        <form class="p-2" method="post" action="make_comment_page">
+          {{ form.csrf_token() }}
+          {{ commentTextField(form.comment_content, 'Let the author know what you think!', autocomplete="off") }}
+          <button type="submit" class="btn" style="background-color: gold;">Submit</button>
+        </form>
       </div>
     </div>
   </div>
 {% endmacro %}
-
 {% macro minipost(post) %}
   <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
     <div class="d-flex w-100 align-items-center justify-content-between">
@@ -96,7 +86,6 @@
     <div class="col-4 mb-1 small">By {{ post.author }}</div>
   </a>
 {% endmacro %}
-
 {% macro author_info(author) %}
   <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
     <div class="d-flex w-100 align-items-center justify-content-center">
@@ -104,7 +93,6 @@
     </div>
   </a>
 {% endmacro %}
-
 {% macro comment(comment_info) %}
   <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
     <div class="col-4 mb-1 small">{{ comment_info.author }}</div>

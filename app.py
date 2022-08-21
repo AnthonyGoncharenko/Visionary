@@ -1,23 +1,30 @@
 import os
+import datetime
+import urllib.request
+from webbrowser import get
 
-from flask import (Flask, flash, g, redirect, render_template, request,
-                   session, url_for)
+from flask import (Flask, flash, g, jsonify, redirect, render_template,
+                   request, session, url_for)
+from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
 from passlib.hash import pbkdf2_sha256
 import datetime
 
+from AuthorForm import AuthorForm
 from CommentForm import CommentForm
 from database import Database
 from PostForm import PostForm
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
-from AuthorForm import AuthorForm
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
 app = Flask(__name__, static_url_path="/static")
 app.config['SECRET_KEY'] = SECRET_KEY
 
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = os.path.join("static", UPLOAD_FOLDER)
+app.config['MAX_CONTENT_LENGTH'] = 64 * 1024 * 1024  #change to increase max file size currently 64 mb file
 
 ########################################################################
 #                           GET DATABASE
@@ -105,20 +112,55 @@ def sign_up_page():
 ########################################################################
 
 ########################################################################
+#                          Image Upload Helper functions
+########################################################################
+
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def handle_image(request, user):
+    file = request.files['post_image']  
+    if file and allowed_file(file.filename):
+        filename = file.filename
+        uid = session['user_details']['user_id']
+        get_db().create_img(uid, filename)
+        imid = get_db().get_img_id(uid, filename)
+        dirname = os.path.join(app.config['UPLOAD_FOLDER'], user)
+        os.makedirs(dirname, exist_ok=True)
+        new_filename = f'{imid}{os.path.splitext(filename)[1]}'
+        save_dir = os.path.join( dirname, new_filename)
+        file.save(save_dir)
+        get_db().update_img(imid, save_dir)
+        return str(imid)
+    else:
+        return "-1"
+
+########################################################################
+#                          End Image Upload Helper functions
+########################################################################
+
+#{{ imageField(form.post_image, accept=".png,.jpg", autocomplete="off") }}
+
+########################################################################
 #                           MAKE POST PAGE
 ########################################################################
 @app.route('/makepost', methods=['GET', 'POST'])
 def make_post_page():
-    if 'user' in session and request.method == 'POST':
-        get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], request.form['post_image'], datetime.datetime.now())
     if 'user' in session:
-        form = PostForm()
-        session['user_details'] =  get_db().get_user(session['user'])
-        return render_template(
-            "MakePost.html", 
-            session=session, 
-            form=form, 
-            trending_posts=trending_posts())
+        user = session['user']
+        if request.method == 'POST':
+            if 'post_image' in request.files:
+                imid = handle_image(request, user)
+                get_db().create_post(user, request.form['post_title'], request.form['post_content'], imid, datetime.datetime.now() )
+                return redirect(url_for('home_page'))
+            else:
+                return redirect(url_for('make_post_page'))
+        elif request.method == 'GET':
+            form = PostForm()
+            session['user_details'] =  get_db().get_user(user)
+            return render_template("MakePost.html", session=session, form=form, trending_posts=trending_posts())
     else:
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
@@ -216,13 +258,14 @@ def followed_authors_page():
 ########################################################################
 #                           MAKE COMMENT PAGE
 ########################################################################
-@app.route('/make_comment', methods=['GET', 'POST'])
+@app.route('/make_comment', methods=['POST'])
 def make_comment_page():
-    if 'user' in session and request.method == 'POST':
-        if form.validate_on_submit():
-            if 'pid' in request.args:
-                pid = request.args['pid']
-                get_db().create_comment(session['user']['uid'], request.args.get('post_id'), request.form['comment_content'])
+    if 'user' in session:
+        if request.method == 'POST':
+            if request.form.validate_on_submit():
+                if 'pid' in request.args:
+                    pid = request.args['pid']
+                    get_db().create_comment(session['user']['uid'], request.args.get('post_id'), request.form['comment_content'])
 
 ########################################################################
 #                         END MAKE COMMENT PAGE
@@ -262,6 +305,77 @@ def profile_page():
 ########################################################################
 
 
+########################################################################
+#                           TESTING
+########################################################################
+@app.route('/<int:n1>', methods=['GET'])
+def testing(n1):
+    import datetime
+    import os 
+    
+    database_name = "visionary_database.db"
+    if os.path.exists(database_name):
+        os.remove(database_name)
+    
+    with open(database_name, 'wb'):
+        ...
+    
+    get_db().create_user('amg568', 'definitely encrypted', 'amg568@gmail.com')
+    get_db().create_user('jeff69420', 'definitely encrypted', 'jeff69@gmail.com')
+    get_db().create_user('elizbeth', 'definitely encrypted', 'elizabeth+netflix@gmail.com')
+    
+    session['user'] = 'amg568'
+    session['user_details']= get_db().get_user(session['user'])
+
+    
+    get_db().create_post('jeff69420', 'jeff\'s first post', 'my favorite color is pink', 'test.jog', datetime.datetime.now())
+    get_db().create_post('jeff69420', 'jeff\'s second post', 'my second favorite color is orange', 'test2.jog', datetime.datetime.now())
+    get_db().create_post('elizbeth', 'I am the queen of england', 'I love my dogs <3', 'test2.jog', datetime.datetime.now())
+
+    #get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], file.filename, datetime.datetime.now() )
+    posts = get_db().get_posts_ids_by_author('jeff69420')
+    print("These are posts", posts)
+    if(len(posts['pids'])!=0):
+        firstpost = posts['pids'][0]
+        get_db().create_comment(get_db().get_user(session['user'])['user_id' ], firstpost, "Comment1")
+        get_db().create_comment(get_db().get_user(session['user'])['user_id' ], firstpost, "comment2")
+        ret_comment = get_db().get_comment(get_db().get_user(session['user'])['user_id' ], firstpost)
+        
+        return jsonify(ret_comment)
+    else:
+        print("no posts for author")
+    # follow(session['user_details']['user_id'] + 1)
+    # follow(session['user_details']['user_id'] + 2)
+    # ant = {'ant' : get_db().get_user('amg568')}
+    get_db().click_on_post(1)
+    get_db().click_on_post(1)
+    get_db().click_on_post(1)
+    get_db().click_on_post(1)
+    get_db().click_on_post(2)
+    get_db().click_on_post(2)
+    get_db().click_on_post(2)
+    get_db().click_on_post(3)
+    get_db().click_on_post(3)
+    get_db().click_on_post(3)
+    get_db().click_on_post(3)
+    get_db().click_on_post(3)
+    get_db().delete_post(n1)
+    data = {'data' :  get_db().get_posts_from_author(get_db().get_user_by_uid(n1)["username"])}
+    unfollow(session['user_details']['user_id'] + 1)
+    unfollow(session['user_details']['user_id'] + 2)
+    ant2 = {'ant' : get_db().get_user('amg568')}
+    get_db().delete_user('jeff69420')
+    get_db().delete_user('amg568')
+    get_db().delete_user('elizbeth')
+    session.pop('user', None)
+    session.pop('user_details', None)
+    return jsonify(data, ant, ant2)
+########################################################################
+#                         END TESTING
+########################################################################
+
+
+
 
 
 ########################################################################
@@ -277,30 +391,6 @@ def logout_page():
 #                         END LOG OUT
 ########################################################################
 
-
-########################################################################
-#                      DATABASE QUERYING
-########################################################################
-@app.route('/api/db/', methods=['GET', 'POST', 'DELETE'])
-def database_querying():
-    #TODO
-    
-    if request.method == 'GET':
-        ...
-    elif request.method == 'POST':
-        ...
-    elif request.method == 'DELETE':
-        ...
-
-
-    if 'user' in session:
-        session['user_details'] =  get_db().get_user(session['user'])
-
-        ...
-########################################################################
-#                    END DATABASE QUERYING
-########################################################################
-
 ########################################################################
 #             CLOSE DB CONNECTION ON APP DISCONNECT
 ########################################################################
@@ -313,14 +403,6 @@ def close_connection(exception):
 #             END CLOSE DB CONNECTION ON APP DISCONNECT
 ########################################################################
 
-def post_to_dict(post):
-    m = {}
-    m['pid'] = post['pid']
-    m['uid'] = post['uid']
-    m['title'] = post['title']
-    m['content'] = post['content']
-    return m
-
 def trending_posts():
     """
     trending_posts Get top 10 posts from the database, and return them in a list
@@ -329,7 +411,7 @@ def trending_posts():
     :rtype: List[dict]
     """ 
     posts = get_db().get_n_trending_posts(10)['posts']
-    return [ post_to_dict(post) for post in posts ]
+    return posts
 
 def recent_posts(n):
     """
@@ -339,7 +421,7 @@ def recent_posts(n):
     :rtype: List[dict]
     """    
     posts = get_db().get_n_recent_posts(n)['posts']
-    return [ post_to_dict(post) for post in posts ]
+    return posts
 
 def pagination(n):
     return recent_posts(n * 10)[(n-1)*10:n*10]
@@ -353,7 +435,7 @@ def followed_posts():
     """    
     if 'user' in session:
         posts = get_db().get_n_followed_posts(session['user'], 10)['posts']
-        return [ post_to_dict(post) for post in posts ]
+        return posts
     return []
 
 def canDelete(pid):
@@ -391,6 +473,10 @@ def get_followed():
         return followed
     else:
         return []
+
+
+
+
 
 def get_followed_posts():
     return []

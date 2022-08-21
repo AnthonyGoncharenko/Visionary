@@ -129,5 +129,10 @@ dmypy.json
 .pyre/
 
 
-.vscode/settings.json
+.vscode/
 *.db
+
+#user uploads
+uploads/
+
+.DS_Store
