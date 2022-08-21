@@ -12,9 +12,7 @@
 {% macro post(post_info) %}
   <div class="p-5 m-5 blog-backing">
     <div class="mb-3 d-flex justify-content-center">
-      {# <img src="{{ url_for('static', filename=uploads/{{ post_info.author }}/{{ post_info.imid }}.png)}}"> #}
-      {# <img id="PostImage"
-      src="uploads\{{ post_info.author }}\{{ post_info.imid }}.png"> #}
+      <img id="PostImage" src="{{ post_info.img_path }}">
     </div>
     <div>
       <h2 id="PostHeader" class="montserrat">{{ post_info.title }}</h2>
