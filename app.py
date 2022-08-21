@@ -48,7 +48,6 @@ def home_page():
         n = int(request.args['page'])
     else:
         n = 1
-    print([post['imid'] for post in trending_posts()])
     return render_template("Home.html", 
         session=session, 
         followed_posts=followed_posts(), 
@@ -121,7 +120,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def handle_image(request, user):
-    file = request.files['file']  
+    file = request.files['post_image']  
     if file and allowed_file(file.filename):
         filename = file.filename
         uid = session['user_details']['user_id']
@@ -151,7 +150,7 @@ def make_post_page():
     if 'user' in session:
         user = session['user']
         if request.method == 'POST':
-            if 'file' in request.files:
+            if 'post_image' in request.files:
                 imid = handle_image(request, user)
                 get_db().create_post(user, request.form['post_title'], request.form['post_content'], imid, datetime.datetime.now() )
                 return redirect(url_for('home_page'))
@@ -290,7 +289,6 @@ def profile_page():
             session['user_details'] = db.get_user(session['user'])
             posts = db.get_posts_from_author(session['user'])['posts']
             user = db.get_user_by_uid(session['user_details']['user_id'])
-            print([post['imid'] for post in posts])
             return render_template(
                 "Profile.html", 
                 user=user, 
