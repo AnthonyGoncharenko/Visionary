@@ -9,8 +9,8 @@
 {% endmacro %}
 
 {% macro author_postfeed(author_posts) %}
-  <div class="p-5 overflow-auto container orange-background">
-    {% for post_info in posts %}
+  <div class="p-5 overflow-auto container orange-background h-100"">
+    {% for post_info in author_posts %}
         {{ post(post_info) }}
     {% endfor %}
   </div>
@@ -77,7 +77,7 @@
         {% endfor %}
       </div>
       <div class="p-3 m-0 h-25 border-top border-5 border-dark" style="background-color: black;">
-          <form class="p-2" method="post" action="make_comment">
+          <form class="p-2" method="post" action="make_comment_page">
             {{ form.csrf_token() }}
             {{ commentTextField(form.comment_content, 'Let the author know what you think!', autocomplete="off") }}
             <button type="submit" class="btn" style="background-color: gold;">Submit</button>

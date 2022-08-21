@@ -124,14 +124,13 @@ def make_post_page():
 ########################################################################
 #                         VIEW POST PAGE
 ########################################################################
-@app.route('/view_post', methods=['GET', 'POST'])
+@app.route('/view_post', methods=['GET'])
 def view_post_page():
-    if request.method == 'GET' :
-        return render_template("ViewPost.html",
-            session=session,
-            postId = request.args.get('post_id'),
-            canDelete=canDelete(request.args.get('post_id')),
-            form=CommentForm())
+    return render_template("ViewPost.html",
+        session=session,
+        postId = request.args.get('post_id'),
+        canDelete=canDelete(request.args.get('post_id')),
+        form=CommentForm())
 
 ########################################################################
 #                         END VIEW POST PAGE
@@ -199,7 +198,12 @@ def authors_page():
 def followed_authors_page():
     if 'user' in session:
         session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("FollowedAuthors.html", session=session)
+        return render_template(
+            "FollowedAuthors.html", 
+            session=session,
+            followed_posts= get_followed_posts(),
+            followed = get_followed(),
+            form = AuthorForm())
 ########################################################################
 #                         END FOLLOWED AUTHORS PAGE
 ########################################################################
@@ -238,7 +242,13 @@ def profile_page():
             session['user_details'] = db.get_user(session['user'])
             posts = db.get_posts_from_author(session['user'])['posts']
             user = db.get_user_by_uid(session['user_details']['user_id'])
-            return render_template("Profile.html", user=user, session=session, posts=posts, followed=get_followed())
+            return render_template(
+                "Profile.html", 
+                user=user, 
+                session=session, 
+                posts=posts, 
+                followed=get_followed(),
+                form=AuthorForm())
         else:
             return redirect(url_for('sign_in_page'))
 
@@ -374,6 +384,9 @@ def get_followed():
         return followed
     else:
         return []
+
+def get_followed_posts():
+    return []
 
 csrf.init_app(app)
 
