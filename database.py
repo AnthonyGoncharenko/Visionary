@@ -78,8 +78,8 @@ class Database:
             imid INTEGER,
             clicks INTEGER DEFAULT 0,
             date DATE,
-            FOREIGN KEY(uid) REFERENCES users(uid),
-            FOREIGN KEY(imid) REFERENCES images(imid)
+            FOREIGN KEY(uid) REFERENCES users(uid) ON DELETE CASCADE,
+            FOREIGN KEY(imid) REFERENCES images(imid) ON DELETE CASCADE
         );''')
         self.conn.commit()
         ###############################################
@@ -94,8 +94,8 @@ class Database:
         (
             imid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             uid INTEGER NOT NULL,
-            img VARBINARY(8000) NOT NULL,
-            FOREIGN KEY(uid) REFERENCES users(uid)
+            img TEXT NOT NULL,
+            FOREIGN KEY(uid) REFERENCES users(uid) ON DELETE CASCADE
         );''')
         self.conn.commit()
         ###############################################
@@ -111,8 +111,8 @@ class Database:
             uid INTEGER NOT NULL,
             pid INTEGER NOT NULL,
             content TEXT NOT NULL,
-            FOREIGN KEY(uid) REFERENCES users(uid),
-            FOREIGN KEY(pid) REFERENCES posts(uid)
+            FOREIGN KEY(uid) REFERENCES users(uid) ON DELETE CASCADE,
+            FOREIGN KEY(pid) REFERENCES posts(uid) ON DELETE CASCADE
         );''')
         self.conn.commit()
         ###############################################
@@ -132,6 +132,9 @@ class Database:
 
     def create_user(self, username, encrypted_password, email):
         self.__execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, encrypted_password, email])
+
+    def delete_user(self, username):
+        self.__execute('DELETE FROM users WHERE username=?', [username])
 
     def get_user(self, username):
         data = self.__select('SELECT * FROM users WHERE username=?', [username])
@@ -158,6 +161,7 @@ class Database:
 
     def delete_post(self, pid):
         self.__execute("DELETE FROM posts where pid=?", [pid])
+
     def create_img(self, uid, img):
         self.__execute('INSERT INTO images (uid, img) VALUES (?, ?)', [uid, img])
 
@@ -167,6 +171,11 @@ class Database:
 
     def __get_img_id(self, uid, img):
         return self.__select('SELECT imid FROM images WHERE uid=? AND img=?', [uid, img])
+    
+    def click_on_post(self, pid):
+        clicks = self.__select("SELECT clicks FROM posts WHERE pid=?", [pid])[0][0]
+        print(clicks)
+        self.__execute("UPDATE posts SET clicks=? WHERE pid=?", [clicks+1, pid])
 
     def get_posts_ids_by_author(self, author):
         data = self.__select('SELECT posts FROM users WHERE username=?', [author])
@@ -187,9 +196,15 @@ class Database:
         return { 
             'posts' : res
          }
+    def get_posts_by_uid(self, uid):
+        posts = self.__select("SELECT * FROM posts WHERE uid=?", [uid])
+        
+        return {
+            'posts' : [post_to_dict(post) for post in posts]
+        }
 
     def get_n_trending_posts(self, n):
-        data = self.__select('SELECT * FROM posts ORDER BY clicks LIMIT ?', [n])
+        data = self.__select('SELECT * FROM posts ORDER BY clicks DESC LIMIT ?', [n])
 
         return {
             'posts' : [post_to_dict(post) for post in data]
@@ -203,10 +218,17 @@ class Database:
         }
 
     def get_n_followed_posts(self, username, n):
-        data = self.__select("SELECT * FROM posts, ( SELECT followed FROM users where username=? ) WHERE posts.pid = followed ORDER BY posts.DATE LIMIT ?", [username, n])
+        from itertools import chain
 
+        followed = list(self.__select("SELECT followed FROM users where username=?", [username])[0])[0].split(" ")
+        followed_posts = [self.get_posts_by_uid(follow)['posts'] for follow in followed if follow != '']
+
+        res = list(chain.from_iterable(followed_posts))
+
+        res.sort(key = lambda post: post['date'], reverse=True)
+        res = res[:n]
         return {
-            'posts' : [post_to_dict(post) for post in data]
+            'posts' : res
         }
     def get_post_by_id(self, pid):
         data = self.__select("SELECT * FROM posts WHERE pid=?", [pid])
