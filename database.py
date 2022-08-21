@@ -161,6 +161,7 @@ class Database:
 
     def delete_post(self, pid):
         self.__execute("DELETE FROM posts where pid=?", [pid])
+
     def create_img(self, uid, img):
         self.__execute('INSERT INTO images (uid, img) VALUES (?, ?)', [uid, img])
 
@@ -170,6 +171,11 @@ class Database:
 
     def __get_img_id(self, uid, img):
         return self.__select('SELECT imid FROM images WHERE uid=? AND img=?', [uid, img])
+    
+    def click_on_post(self, pid):
+        clicks = self.__select("SELECT clicks FROM posts WHERE pid=?", [pid])[0][0]
+        print(clicks)
+        self.__execute("UPDATE posts SET clicks=? WHERE pid=?", [clicks+1, pid])
 
     def get_posts_ids_by_author(self, author):
         data = self.__select('SELECT posts FROM users WHERE username=?', [author])
@@ -198,7 +204,7 @@ class Database:
         }
 
     def get_n_trending_posts(self, n):
-        data = self.__select('SELECT * FROM posts ORDER BY clicks LIMIT ?', [n])
+        data = self.__select('SELECT * FROM posts ORDER BY clicks DESC LIMIT ?', [n])
 
         return {
             'posts' : [post_to_dict(post) for post in data]
