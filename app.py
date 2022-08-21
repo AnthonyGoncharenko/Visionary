@@ -37,11 +37,15 @@ def get_db():
 ########################################################################
 @app.route('/home', methods=['GET', 'POST'])
 def home_page():
+    if 'page' in request.args:
+        n = int(request.args['page'])
+    else:
+        n = 1
     return render_template("Home.html", 
         session=session, 
         followed_posts=followed_posts(), 
         trending_posts=trending_posts(), 
-        recent_posts=recent_posts())
+        recent_posts=pagination(n))
 ########################################################################
 #                         END HOME PAGE
 ########################################################################
@@ -234,14 +238,15 @@ def profile_page():
             session['user_details'] = db.get_user(session['user'])
             posts = db.get_posts_from_author(session['user'])['posts']
             user = db.get_user_by_uid(session['user_details']['user_id'])
-            print(posts)
-            return render_template("Profile.html", user=user, session=session, posts=posts)
+            return render_template("Profile.html", user=user, session=session, posts=posts, followed=get_followed())
         else:
             return redirect(url_for('sign_in_page'))
 
 ########################################################################
 #                         END PROFILE PAGE
 ########################################################################
+
+
 
 
 ########################################################################
@@ -310,16 +315,19 @@ def trending_posts():
     """ 
     posts = get_db().get_n_trending_posts(10)['posts']
     return [ post_to_dict(post) for post in posts ]
-    
-def recent_posts():
+
+def recent_posts(n):
     """
-    recent_posts Get 10 most recent posts from the database, and return them in a list
+    recent_posts Get n most recent posts from the database, and return them in a list
 
     :return: List of Post dictionaries
     :rtype: List[dict]
     """    
-    posts = get_db().get_n_recent_posts(10)['posts']
+    posts = get_db().get_n_recent_posts(n)['posts']
     return [ post_to_dict(post) for post in posts ]
+
+def pagination(n):
+    return recent_posts(n * 10)[(n-1)*10:n*10]
 
 def followed_posts():
     """
@@ -357,6 +365,15 @@ def unfollow(pid):
         db = get_db()
         uid = db.get_user(session['user'])["user_id"]
         db.unfollow(uid, pid)
+def get_followed():
+    if 'user' in session:
+        db = get_db()
+        session['user_details'] = db.get_user(session['user'])
+        followed = session['user_details']['followed']
+        followed = [db.get_user_by_uid(int(follow)) for follow in followed if follower != ""]
+        return followed
+    else:
+        return []
 
 csrf.init_app(app)
 
