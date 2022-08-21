@@ -174,7 +174,7 @@ class Database:
     
     def click_on_post(self, pid):
         clicks = self.__select("SELECT clicks FROM posts WHERE pid=?", [pid])[0][0]
-        print(clicks)
+    
         self.__execute("UPDATE posts SET clicks=? WHERE pid=?", [clicks+1, pid])
 
     def get_posts_ids_by_author(self, author):
@@ -256,6 +256,14 @@ class Database:
 
     def create_comment(self, uid, pid, content):
         self.__execute("INSERT INTO comments (uid, pid, content) VALUES (?, ?, ?)", [uid, pid, content])
+
+    def get_comment(self, uid,pid):
+        data = self.__select('SELECT * FROM comments WHERE uid=? and  pid=?', [uid,pid])
+        if data:
+            return {
+            'comments' : [comment_to_dict(comment) for comment in data]
+        }
+        
 
     def close(self):
         self.conn.close()

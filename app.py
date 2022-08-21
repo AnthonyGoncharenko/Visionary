@@ -1,6 +1,7 @@
 import os
 import datetime
 import urllib.request
+from webbrowser import get
 
 from flask import (Flask, flash, g, jsonify, redirect, render_template,
                    request, session, url_for)
@@ -304,6 +305,7 @@ def profile_page():
 #                         END PROFILE PAGE
 ########################################################################
 
+
 ########################################################################
 #                           TESTING
 ########################################################################
@@ -326,11 +328,22 @@ def testing(n):
     session['user'] = 'amg568'
     session['user_details']= get_db().get_user(session['user'])
 
-
+    
     get_db().create_post('jeff69420', 'jeff\'s first post', 'my favorite color is pink', 'test.jog', datetime.datetime.now())
     get_db().create_post('jeff69420', 'jeff\'s second post', 'my second favorite color is orange', 'test2.jog', datetime.datetime.now())
     get_db().create_post('elizbeth', 'I am the queen of england', 'I love my dogs <3', 'test2.jog', datetime.datetime.now())
 
+    #get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], file.filename, datetime.datetime.now() )
+    posts = get_db().get_posts_ids_by_author('jeff69420')
+    print("These are posts", posts)
+    if(len(posts['pids'])!=0):
+        firstpost = posts['pids'].split()[0]
+        print("this is firstpost", firstpost, "session: userid", session['user'])
+        get_db().create_comment(session['user'], firstpost, "this is a test commment")
+        ret_comment = get_db().get_comment(get_db().get_user(session['user'])['user_id' ], firstpost)
+        return jsonify(ret_comment)
+    else:
+        print("no posts for author")
     # follow(session['user_details']['user_id'] + 1)
     # follow(session['user_details']['user_id'] + 2)
     # ant = {'ant' : get_db().get_user('amg568')}
@@ -464,6 +477,10 @@ def get_followed():
         return followed
     else:
         return []
+
+
+
+
 
 def get_followed_posts():
     return []
