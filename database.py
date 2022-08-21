@@ -148,11 +148,10 @@ class Database:
         if data:
             return user_to_dict(data[0])
 
-    def create_post(self, username, title, content, img, date):
+    def create_post(self, username, title, content, imid, date):
         if (user := self.get_user(username)) is None:
             return 
-        self.create_img(user['user_id'], img)
-        imid = self.__get_img_id(user['user_id'], img)[0][0]
+
         self.__execute('INSERT INTO posts (uid, title, content, imid, date) VALUES (?, ?, ?, ?, ?)', [user['user_id'], title, content, imid, date])
 
         pid = self.__select("SELECT pid FROM posts WHERE uid=? AND title=? AND content=? AND imid=?", [user['user_id'], title, content, imid])[0][0]
@@ -169,11 +168,11 @@ class Database:
         self.__execute('INSERT INTO images (uid, img) VALUES (?, ?)', [uid, img])
 
     def get_img(self, imid):
-        image = self.__select('SELECT * FROM images WHERE imid=?', [imid])[0]
-        return image_to_dict(image)
+        image = self.__select('SELECT * FROM images WHERE imid=?', [imid])
+        return image_to_dict(image[0])
 
-    def __get_img_id(self, uid, img):
-        return self.__select('SELECT imid FROM images WHERE uid=? AND img=?', [uid, img])
+    def get_img_id(self, uid, img):
+        return self.__select('SELECT imid FROM images WHERE uid=? AND img=?', [uid, img])[0][0]
     
     def click_on_post(self, pid):
         clicks = self.__select("SELECT clicks FROM posts WHERE pid=?", [pid])[0][0]
@@ -195,29 +194,49 @@ class Database:
                 continue
             post = self.__select('SELECT * FROM posts where pid=?', [pid])
             if len(post) > 0:
-                res.append(post_to_dict(post[0]))
+                v = post_to_dict(post[0])
+                v["author"] = self.get_user_by_uid(v["uid"])['username']
+                res.append(v)
         return { 
             'posts' : res
          }
     def get_posts_by_uid(self, uid):
         posts = self.__select("SELECT * FROM posts WHERE uid=?", [uid])
         
+        res = []
+        for post in posts:
+            v = post_to_dict(post)
+            v["author"] = self.get_user_by_uid(v["uid"])['username']
+            res.append(v)
+
         return {
-            'posts' : [post_to_dict(post) for post in posts]
+            'posts' : res
         }
 
     def get_n_trending_posts(self, n):
-        data = self.__select('SELECT * FROM posts ORDER BY clicks DESC LIMIT ?', [n])
+        posts = self.__select('SELECT * FROM posts ORDER BY clicks DESC LIMIT ?', [n])
+
+        res = []
+        for post in posts:
+            v = post_to_dict(post)
+            v["author"] = self.get_user_by_uid(v["uid"])['username']
+            res.append(v)
 
         return {
-            'posts' : [post_to_dict(post) for post in data]
+            'posts' : res
         }
 
     def get_n_recent_posts(self, n):
-        data = self.__select('SELECT * FROM posts ORDER BY DATE DESC LIMIT ?', [n])
+        posts = self.__select('SELECT * FROM posts ORDER BY DATE DESC LIMIT ?', [n])
+
+        res = []
+        for post in posts:
+            v = post_to_dict(post)
+            v["author"] = self.get_user_by_uid(v["uid"])['username']
+            res.append(v)
 
         return {
-            'posts' : [post_to_dict(post) for post in data]
+            'posts' : res
         }
 
     def get_n_followed_posts(self, username, n):
@@ -233,10 +252,18 @@ class Database:
         return {
             'posts' : res
         }
+
     def get_post_by_id(self, pid):
-        data = self.__select("SELECT * FROM posts WHERE pid=?", [pid])
+        posts = self.__select("SELECT * FROM posts WHERE pid=?", [pid])
+
+        res = []
+        for post in posts:
+            v = post_to_dict(post)
+            v["author"] = self.get_user_by_uid(v["uid"])['username']
+            res.append(v)
+
         return {
-            'posts' : [post_to_dict(post) for post in data]
+            'posts' : res
         }
 
     def follow(self, uid, pid):

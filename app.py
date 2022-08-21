@@ -21,8 +21,8 @@ csrf = CSRFProtect()
 app = Flask(__name__, static_url_path="/static")
 app.config['SECRET_KEY'] = SECRET_KEY
 
-UPLOAD_FOLDER = 'uploads/'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = os.path.join("static", UPLOAD_FOLDER)
 app.config['MAX_CONTENT_LENGTH'] = 64 * 1024 * 1024  #change to increase max file size currently 64 mb file
 
 ########################################################################
@@ -48,6 +48,7 @@ def home_page():
         n = int(request.args['page'])
     else:
         n = 1
+    print([post['imid'] for post in trending_posts()])
     return render_template("Home.html", 
         session=session, 
         followed_posts=followed_posts(), 
@@ -119,28 +120,21 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def handle_image(request,user):
-    if 'file' not in request.files:
-        print('No file part')
-        return redirect(request.url)
-    file = request.files['file']
-    
-  
-    print("request file", file.filename)
-    if file.filename == '':
-        print('No image selected for uploading')
-        return redirect(request.url)
+def handle_image(request, user):
+    file = request.files['file']  
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        dirname = app.config['UPLOAD_FOLDER'] + user 
+        filename = file.filename
+        uid = session['user_details']['user_id']
+        get_db().create_img(uid, filename)
+        imid = get_db().get_img_id(uid, filename)
+        dirname = os.path.join(app.config['UPLOAD_FOLDER'], user)
         os.makedirs(dirname, exist_ok=True)
-        file.save(os.path.join( dirname, filename))
-        print("secure_filename", filename )
-        print('upload_image filename: ' + filename)
-        print('Image successfully uploaded and displayed below')
+        new_filename = f'{imid}{os.path.splitext(filename)[1]}'
+        save_dir = os.path.join( dirname, new_filename)
+        file.save(save_dir)
+        return save_dir
     else:
-        print('Allowed image types are -> png, jpg, jpeg, gif')
-        return redirect(request.url)
+        return "-1"
 
 ########################################################################
 #                          End Image Upload Helper functions
@@ -153,16 +147,19 @@ def handle_image(request,user):
 ########################################################################
 @app.route('/makepost', methods=['GET', 'POST'])
 def make_post_page():
-    if 'user' in session and request.method == 'POST':
-        file = request.files['file']
-        get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], file.filename, datetime.datetime.now() )
-        #print(request.form['post_image'])
-        user = session['user']
-        handle_image(request,user)
     if 'user' in session:
-        form = PostForm()
-        session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("MakePost.html", session=session, form=form, trending_posts=trending_posts())
+        user = session['user']
+        if request.method == 'POST':
+            if 'file' in request.files:
+                save_dir = handle_image(request, user)
+                imid = os.path.splitext(save_dir)[0]
+                return imid
+                get_db().create_post(user, request.form['post_title'], request.form['post_content'], imid, datetime.datetime.now() )
+                return redirect(save_dir)
+        elif request.method == 'GET':
+            form = PostForm()
+            session['user_details'] =  get_db().get_user(user)
+            return render_template("MakePost.html", session=session, form=form, trending_posts=trending_posts())
     else:
         flash("SIGN IN FIRST BEFORE MAKING A POST!!")
         return redirect(url_for('sign_in_page'))
@@ -260,13 +257,14 @@ def followed_authors_page():
 ########################################################################
 #                           MAKE COMMENT PAGE
 ########################################################################
-@app.route('/make_comment', methods=['GET', 'POST'])
+@app.route('/make_comment', methods=['POST'])
 def make_comment_page():
-    if 'user' in session and request.method == 'POST':
-        if form.validate_on_submit():
-            if 'pid' in request.args:
-                pid = request.args['pid']
-                get_db().create_comment(session['user']['uid'], request.args.get('post_id'), request.form['comment_content'])
+    if 'user' in session:
+        if request.method == 'POST':
+            if request.form.validate_on_submit():
+                if 'pid' in request.args:
+                    pid = request.args['pid']
+                    get_db().create_comment(session['user']['uid'], request.args.get('post_id'), request.form['comment_content'])
 
 ########################################################################
 #                         END MAKE COMMENT PAGE
@@ -291,6 +289,7 @@ def profile_page():
             session['user_details'] = db.get_user(session['user'])
             posts = db.get_posts_from_author(session['user'])['posts']
             user = db.get_user_by_uid(session['user_details']['user_id'])
+            print([post['imid'] for post in posts])
             return render_template(
                 "Profile.html", 
                 user=user, 
@@ -404,14 +403,6 @@ def close_connection(exception):
 #             END CLOSE DB CONNECTION ON APP DISCONNECT
 ########################################################################
 
-def post_to_dict(post):
-    m = {}
-    m['pid'] = post['pid']
-    m['uid'] = post['uid']
-    m['title'] = post['title']
-    m['content'] = post['content']
-    return m
-
 def trending_posts():
     """
     trending_posts Get top 10 posts from the database, and return them in a list
@@ -420,7 +411,7 @@ def trending_posts():
     :rtype: List[dict]
     """ 
     posts = get_db().get_n_trending_posts(10)['posts']
-    return [ post_to_dict(post) for post in posts ]
+    return posts
 
 def recent_posts(n):
     """
@@ -430,7 +421,7 @@ def recent_posts(n):
     :rtype: List[dict]
     """    
     posts = get_db().get_n_recent_posts(n)['posts']
-    return [ post_to_dict(post) for post in posts ]
+    return posts
 
 def pagination(n):
     return recent_posts(n * 10)[(n-1)*10:n*10]
@@ -444,7 +435,7 @@ def followed_posts():
     """    
     if 'user' in session:
         posts = get_db().get_n_followed_posts(session['user'], 10)['posts']
-        return [ post_to_dict(post) for post in posts ]
+        return posts
     return []
 
 def canDelete(pid):
