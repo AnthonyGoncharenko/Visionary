@@ -309,8 +309,8 @@ def profile_page():
 ########################################################################
 #                           TESTING
 ########################################################################
-@app.route('/<int:n>', methods=['GET'])
-def testing(n):
+@app.route('/<int:n1>', methods=['GET'])
+def testing(n1):
     import datetime
     import os 
     
@@ -359,15 +359,17 @@ def testing(n):
     get_db().click_on_post(3)
     get_db().click_on_post(3)
     get_db().click_on_post(3)
-    data = {'data' :  get_db().get_n_trending_posts(n)}
-    # unfollow(session['user_details']['user_id'] + 1)
-    # unfollow(session['user_details']['user_id'] + 2)
+    get_db().delete_post(n1)
+    data = {'data' :  get_db().get_posts_from_author(get_db().get_user_by_uid(n1)["username"])}
+    unfollow(session['user_details']['user_id'] + 1)
+    unfollow(session['user_details']['user_id'] + 2)
+    ant2 = {'ant' : get_db().get_user('amg568')}
     get_db().delete_user('jeff69420')
     get_db().delete_user('amg568')
     get_db().delete_user('elizbeth')
     session.pop('user', None)
     session.pop('user_details', None)
-    return jsonify(data)
+    return jsonify(data, ant, ant2)
 ########################################################################
 #                         END TESTING
 ########################################################################
