@@ -155,6 +155,8 @@ def make_post_page():
                 imid = handle_image(request, user)
                 get_db().create_post(user, request.form['post_title'], request.form['post_content'], imid, datetime.datetime.now() )
                 return redirect(url_for('home_page'))
+            else:
+                return redirect(url_for('make_post_page'))
         elif request.method == 'GET':
             form = PostForm()
             session['user_details'] =  get_db().get_user(user)
