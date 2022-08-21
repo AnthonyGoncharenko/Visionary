@@ -217,6 +217,8 @@ class Database:
     def follow(self, uid, pid):
         if (user := self.get_user_by_uid(uid)) is not None:
             followed = user["followed"].split(" ")
+            if "" in followed:
+                followed.pop(followed.index(""))
             if str(pid) not in followed:
                 followed.append(str(pid))
                 new_followed = " ".join(followed)
