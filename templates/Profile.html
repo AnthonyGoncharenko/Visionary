@@ -10,42 +10,36 @@
 {% block content %}
 <div class="row m-0 h-100" >
   <div class="col-8 p-0 {% if user.username == session['user'] %} gold-background {% else %} magenta-background {% endif %} mb-auto h-100">
-    <div class="row p-5 container-fluid">
-      <h1>{{ user.username }}'s Profile</h1>
-      <div class="col-8 border rounded flex-md-row shadow-sm border-dark p-3 {% if user.username == session['user'] %} gold-menu {% else %} magenta-menu {% endif %}">
-        <div class = "row mb-1">
-          <p class="m-0" style="font-weight: bolder;">
-            Username:
-          </p>
-          <p>
-            {{ user.username }}
-          </p>
+    <div style="height: 27%;">
+      <div class="row p-3 m-0 container-fluid">
+        <h1>{{ user.username }}'s Profile</h1>
+        <div class="col-8 border rounded flex-md-row shadow-sm border-dark p-3 {% if user.username == session['user'] %} gold-menu {% else %} magenta-menu {% endif %}">
+          <div class = "row">
+            <p class="m-0" style="font-weight: bolder;">
+              Email:
+            </p>
+            <p class="m-0">
+              {{ user.email }}
+            </p>
+          </div>
         </div>
-        <div class = "row">
-          <p class="m-0" style="font-weight: bolder;">
-            Email:
-          </p>
-          <p>
-            {{ user.email }}
-          </p>
+        <div class="col">
+          {% if user.username == session['user'] %}
+            <button type="submit" class="btn" style="background-color: red; color: white;">Delete Your Account</button>
+          {% elif user.username in session['user'].followed %}
+            <button type="submit" class="btn" style="background-color: darkorange; color: white;">Unfollow this User</button>
+          {% else %}
+            <button type="submit" class="btn" style="background-color: darkmagenta; color: white;">Follow this User</button>
+          {% endif %}
         </div>
       </div>
-      <div class="col">
-        {% if user.username == session['user'] %}
-          <button type="submit" class="btn" style="background-color: red; color: white;">Delete Your Account</button>
-        {% elif user.username in session['user'].followed %}
-          <button type="submit" class="btn" style="background-color: darkorange; color: white;">Unfollow this User</button>
-        {% else %}
-          <button type="submit" class="btn" style="background-color: darkmagenta; color: white;">Follow this User</button>
-        {% endif %}
+      <div class="row border-top border-dark border-3 border-bottom align-items-center m-0" style="background-image: linear-gradient(180deg, orange, chocolate);">
+        <p class="text-center m-1" style="font-weight: bolder; color:white;">
+          {{ user.username }}'s Posts
+        </p>
       </div>
     </div>
-    <div class="row border-top border-dark border-3 border-bottom align-items-center m-0" style="background-image: linear-gradient(180deg, orange, chocolate);">
-      <p class="text-center m-3" style="font-weight: bolder; color:white;">
-        {{ user.username }}'s Posts
-      </p>
-    </div>
-    <div class="row p-0 container-fluid m-0 h-100">
+    <div class="row p-0 container-fluid m-0" style="height: 73%">
       {{ postfeed(posts) }}
     </div>
   </div>

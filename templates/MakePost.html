@@ -18,7 +18,7 @@
         {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
       {% endif %}
       <div class="col-5 border rounded flex-md-row shadow-sm border-dark" style="border-color: darkmagenta!important; background-color: palevioletred;">
-        <form class="p-3" method="post" action="/comment">
+        <form class="p-3" method="post" action="/makepost">
             {{ form.csrf_token() }}
             {{ displayField(form.post_title, 'My New Post!', autocomplete="off") }}
             {{ textField(form.post_content, rows=3, autocomplete="off") }}

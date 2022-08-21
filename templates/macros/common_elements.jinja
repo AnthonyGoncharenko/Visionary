@@ -1,7 +1,7 @@
 {% from "form_helper.html" import commentTextField, displayField %}
 
 {% macro postfeed(posts) %}
-  <div class="p-5 overflow-auto container crimson-background h-100"">
+  <div class="px-5 overflow-auto container crimson-background h-100"">
     {% for post_info in posts %}
         {{ post(post_info) }}
     {% endfor %}
@@ -9,7 +9,7 @@
 {% endmacro %}
 
 {% macro author_postfeed(author_posts) %}
-  <div class="p-5 overflow-auto container orange-background h-100"">
+  <div class="px-5 overflow-auto container orange-background h-100"">
     {% for post_info in author_posts %}
         {{ post(post_info) }}
     {% endfor %}
@@ -22,8 +22,8 @@
       <img id="PostImage" src="/get_image?imid={{ post_info.image }}" >
     </div>
     <div>
-      <h2 id="PostHeader" class="montserrat">{{ post_info.title }}</h2>
-      <p id="PostText"> {{ post_info.content }} </p>
+      <h2 id="PostHeader" class="text-wrap text-break">{{ post_info.title }}</h2>
+      <p class="text-wrap text-break montserrat"> {{ post_info.content }} </p>
     </div>
   </div>
 {% endmacro %}
