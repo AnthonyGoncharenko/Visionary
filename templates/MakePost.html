@@ -9,25 +9,30 @@
   {{ super() }}
 {% endblock head %}
 {% block content %}
-<div class="row m-0 h-100" >
-  <div class="col-8 p-0 magenta-background mb-auto h-100">
-    <div class="p-5 overflow-auto container-fluid">
-      <h1 class="signupheader">Orchestrate Your New Post</h1>
-      {% if error_messages %}
-        <p class="mb-0">Sorry... We ran into some problems:</p>
-        {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
-      {% endif %}
-      <div class="col-5 border rounded flex-md-row shadow-sm border-dark" style="border-color: darkmagenta!important; background-color: palevioletred;">
-        <form class="p-3" method="post" action="" enctype="multipart/form-data" >
+  <div class="row m-0 h-100">
+    <div class="col-8 p-0 magenta-background mb-auto h-100">
+      <div class="p-5 overflow-auto container-fluid">
+        <h1 class="signupheader">Orchestrate Your New Post</h1>
+        {% if error_messages %}
+          <p class="mb-0">Sorry... We ran into some problems:</p>
+          {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
+        {% endif %}
+        <div class="col-5 border rounded flex-md-row shadow-sm border-dark"
+             style="border-color: darkmagenta!important;
+                    background-color: palevioletred;">
+          <form class="p-3" method="post" action="" enctype="multipart/form-data">
             {{ form.csrf_token() }}
             {{ displayField(form.post_title, 'My New Post!', autocomplete="off") }}
             {{ textField(form.post_content, rows=3, autocomplete="off") }}
             {{ imageField(form.post_image, accept=".png,.jpg,.gif,.jpeg", autocomplete="off") }}
-          <button type="submit" class="btn" style="background-color: magenta; color:white;">Preview your Post</button>
-        </form>
+            <button type="submit"
+                    class="btn"
+                    style="background-color: magenta;
+                           color:white;">Preview your Post</button>
+          </form>
+        </div>
       </div>
     </div>
+    {{ postRail(trending_posts) }}
   </div>
-  {{ postRail(trending_posts) }}
-</div>
 {% endblock content %}

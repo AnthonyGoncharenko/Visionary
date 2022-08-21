@@ -8,6 +8,7 @@ from flask import (Flask, flash, g, jsonify, redirect, render_template,
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
 from passlib.hash import pbkdf2_sha256
+import datetime
 
 from AuthorForm import AuthorForm
 from CommentForm import CommentForm
@@ -174,7 +175,7 @@ def make_post_page():
 def view_post_page():
     return render_template("ViewPost.html",
         session=session,
-        postId = request.args.get('post_id'),
+        post = get_db().get_post_by_id(request.args.get('post_id'))['posts'][0],
         canDelete=canDelete(request.args.get('post_id')),
         form=CommentForm())
 
@@ -440,8 +441,10 @@ def followed_posts():
 def canDelete(pid):
     db = get_db()
     if 'user' in session:
-        if post := db.get_post_by_id(pid)['posts']:
-            if (user := db.get_user_by_id(post["uid"])) is not None:
+        print(session)
+        if post := db.get_post_by_id(pid)['posts'][0]:
+            print(post)
+            if (user := db.get_user_by_uid(post["uid"])) is not None:
                 if user['username'] == session['user']:
                     return True
     return False
