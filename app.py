@@ -10,6 +10,7 @@ from database import Database
 from PostForm import PostForm
 from SignInForm import SignInForm
 from SignUpForm import SignUpForm
+from AuthorForm import AuthorForm
 
 SECRET_KEY = os.urandom(32)
 csrf = CSRFProtect()
@@ -119,14 +120,15 @@ def make_post_page():
 ########################################################################
 #                         VIEW POST PAGE
 ########################################################################
-@app.route('/view_post', methods=['GET'])
+@app.route('/view_post', methods=['GET', 'POST'])
 def view_post_page():
     if request.method == 'GET' :
-        if 'user' in session:
-            session['user_details'] =  get_db().get_user(session['user'])
-        return render_template("ViewPost.html", session=session, postId = request.args.get('post_id'), canDelete=canDelete(request.args.get('post_id')))
-    else:
-        return redirect(url_for('home_page'))
+        return render_template("ViewPost.html",
+            session=session,
+            postId = request.args.get('post_id'),
+            canDelete=canDelete(request.args.get('post_id')),
+            form=CommentForm())
+
 ########################################################################
 #                         END VIEW POST PAGE
 ########################################################################
@@ -180,7 +182,8 @@ def unfollow_author():
 ########################################################################
 @app.route('/authors', methods=['GET', 'POST'])
 def authors_page():
-    return render_template("FindAuthors.html")
+    form = AuthorForm()
+    return render_template("FindAuthors.html", form=form)
 ########################################################################
 #                        END FIND AUTHORS PAGE
 ########################################################################
@@ -202,16 +205,11 @@ def followed_authors_page():
 ########################################################################
 @app.route('/make_comment', methods=['GET', 'POST'])
 def make_comment_page():
-    if 'user' in session:
-        session['user_details'] =  get_db().get_user(session['user'])
-        form = CommentForm()
-        if request.method == 'GET':
-            return render_template("MakeComment.html", form=form, session=session)
-        elif request.method == 'POST':
-            if form.validate_on_submit():
-                if 'pid' in request.args:
-                    pid = request.args['pid']
-                    get_db().create_comment(session['user_details']['user_id'], pid, request.form.get('content'))
+    if 'user' in session and request.method == 'POST':
+        if form.validate_on_submit():
+            if 'pid' in request.args:
+                pid = request.args['pid']
+                get_db().create_comment(session['user']['uid'], request.args.get('post_id'), request.form['comment_content'])
 
 ########################################################################
 #                         END MAKE COMMENT PAGE
@@ -240,7 +238,6 @@ def profile_page():
             return render_template("Profile.html", user=user, session=session, posts=posts)
         else:
             return redirect(url_for('sign_in_page'))
-    
 
 ########################################################################
 #                         END PROFILE PAGE

@@ -18,7 +18,7 @@
           {% for message in error_messages %}<p style="color:red">{{ message }}</p>{% endfor %}
         {% endif %}
         <div class="col-5 border rounded flex-md-row shadow-sm border-dark gold-menu">
-          <form class="p-3" method="post" action="" id="SignIn">
+          <form class="p-3" method="post" action="">
             {{ form.csrf_token() }}
             {{ displayField(form.username, 'username', autocomplete="off") }}
             {{ displayField(form.email, 'user@emailservice.com', autocomplete="off") }}

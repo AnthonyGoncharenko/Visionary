@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, SubmitField
+from wtforms import StringField, SubmitField
 from wtforms.validators import (DataRequired, Length)
 
-class CommentForm(FlaskForm):
-    comment_content = TextAreaField(
-        label=('Leave a Comment:'),
+class AuthorForm(FlaskForm):
+    author_name = StringField(
+        label=("Find an Author's Profile"),
         validators=[DataRequired(), Length(max = 512)])
     submit = SubmitField(label=('Submit'))

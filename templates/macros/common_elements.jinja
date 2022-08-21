@@ -1,3 +1,5 @@
+{% from "form_helper.html" import commentTextField, displayField %}
+
 {% macro postfeed(posts) %}
   <div class="p-5 overflow-auto container crimson-background h-100"">
     {% for post_info in posts %}
@@ -28,11 +30,11 @@
 
 {% macro postRail(posts) %}
   <div class="col p-0 sticky-top h-100">
-    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5 overflow-auto">
+    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
       <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, orange, chocolate);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Trending Posts</span>
       </div>
-      <div class="list-group list-group-flush">
+      <div class="list-group list-group-flush overflow-auto">
         {% for post in posts %}
           {{ minipost(post) }}
         {% endfor %}
@@ -41,31 +43,45 @@
   </div>
 {% endmacro %}
 
-{% macro authorsTab(authors) %}
+{% macro authorsTab(authors, form) %}
   <div class="col p-0 sticky-top h-100">
-    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5 overflow-auto">
+    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
       <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, magenta, darkmagenta);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Followed Authors</span>
       </div>
-      <div class="list-group list-group-flush">
+      <div class="overflow-auto m-0 list-group list-group-flush h-75" style="background-color: mediumorchid">
         {% for author in authors %}
           {{ author_info(author) }}
         {% endfor %}
+      </div>
+      <div class="p-3 m-0 h-25 border-top border-5 border-dark" style="background-color: darkmagenta;">
+          <form class="p-2" method="post" action="make_comment">
+            {{ form.csrf_token() }}
+            {{ commentTextField(form.author_name, 'username', autocomplete="off") }}
+            <button type="submit" class="btn" style="background-color: magenta;">Submit</button>
+          </form>
       </div>
     </div>
   </div>
 {% endmacro %}
 
-{% macro commentSection(comments) %}
+{% macro commentSection(comments, form) %}
   <div class="col p-0 sticky-top h-100">
-    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5 overflow-auto">
+    <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
       <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5" style="background-image: linear-gradient(180deg, darkgrey, black);">
         <span class="fs-5 fw-semibold montserrat" style="color: white">Comments on this Post</span>
       </div>
-      <div class="list-group list-group-flush">
+      <div class="overflow-auto m-0 list-group list-group-flush h-75" style="background-color: gray">
         {% for comment_info in comments %}
           {{ comment(comment_info) }}
         {% endfor %}
+      </div>
+      <div class="p-3 m-0 h-25 border-top border-5 border-dark" style="background-color: black;">
+          <form class="p-2" method="post" action="make_comment">
+            {{ form.csrf_token() }}
+            {{ commentTextField(form.comment_content, 'Let the author know what you think!', autocomplete="off") }}
+            <button type="submit" class="btn" style="background-color: gold;">Submit</button>
+          </form>
       </div>
     </div>
   </div>
