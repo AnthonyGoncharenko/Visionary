@@ -1,7 +1,10 @@
 import os
+import datetime
+import urllib.request
 
 from flask import (Flask, flash, g, redirect, render_template, request,
                    session, url_for)
+from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
 from passlib.hash import pbkdf2_sha256
 
@@ -16,6 +19,9 @@ csrf = CSRFProtect()
 app = Flask(__name__, static_url_path="/static")
 app.config['SECRET_KEY'] = SECRET_KEY
 
+UPLOAD_FOLDER = 'uploads/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 64 * 1024 * 1024  #change to increase max file size currently 64 mb file
 
 ########################################################################
 #                           GET DATABASE
@@ -99,12 +105,54 @@ def sign_up_page():
 ########################################################################
 
 ########################################################################
+#                          Image Upload Helper functions
+########################################################################
+
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def handle_image(request,user):
+    if 'file' not in request.files:
+        print('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    
+  
+    print("request file", file.filename)
+    if file.filename == '':
+        print('No image selected for uploading')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        dirname = app.config['UPLOAD_FOLDER'] + user 
+        os.makedirs(dirname, exist_ok=True)
+        file.save(os.path.join( dirname, filename))
+        print("secure_filename", filename )
+        print('upload_image filename: ' + filename)
+        print('Image successfully uploaded and displayed below')
+    else:
+        print('Allowed image types are -> png, jpg, jpeg, gif')
+        return redirect(request.url)
+
+########################################################################
+#                          End Image Upload Helper functions
+########################################################################
+
+#{{ imageField(form.post_image, accept=".png,.jpg", autocomplete="off") }}
+
+########################################################################
 #                           MAKE POST PAGE
 ########################################################################
 @app.route('/makepost', methods=['GET', 'POST'])
 def make_post_page():
     if 'user' in session and request.method == 'POST':
-        get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], request.form['post_image'])
+        file = request.files['file']
+        get_db().create_post(session['user'], request.form['post_title'], request.form['post_content'], file.filename, datetime.datetime.now() )
+        #print(request.form['post_image'])
+        user = session['user']
+        handle_image(request,user)
     if 'user' in session:
         form = PostForm()
         session['user_details'] =  get_db().get_user(session['user'])
