@@ -90,6 +90,11 @@
     font-family: 'Montserrat', sans-serif;
 }
 
+.montserrat-white {
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+}
+
 .branding-header {
     background-image: linear-gradient(90deg, gold, white);
 }

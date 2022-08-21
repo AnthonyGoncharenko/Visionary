@@ -33,7 +33,7 @@
       <div class="col">
         {% if user.username == session['user'] %}
           <button type="submit" class="btn" style="background-color: red; color: white;">Delete Your Account</button>
-        {% elif user.username in session['user'].followed_authors %}
+        {% elif user.username in session['user'].followed %}
           <button type="submit" class="btn" style="background-color: darkorange; color: white;">Unfollow this User</button>
         {% else %}
           <button type="submit" class="btn" style="background-color: darkmagenta; color: white;">Follow this User</button>
@@ -45,10 +45,10 @@
         {{ user.username }}'s Posts
       </p>
     </div>
-    <div class="row p-0 container-fluid m-0">
-      {{ postfeed(user.user_id) }}
+    <div class="row p-0 container-fluid m-0 h-100">
+      {{ postfeed(posts) }}
     </div>
   </div>
-  {{ authorsTab(user.userId) }}
+  {{ authorsTab(followed, form) }}
 </div>
 {% endblock content %}
