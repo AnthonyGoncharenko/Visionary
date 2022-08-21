@@ -260,8 +260,7 @@ class Database:
 
     def get_comment(self, uid,pid):
         data = self.__select('SELECT * FROM comments WHERE uid=? and  pid=?', [uid,pid])
-        if data:
-            return {
+        return {
             'comments' : [comment_to_dict(comment) for comment in data]
         }
         

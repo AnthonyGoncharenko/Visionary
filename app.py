@@ -337,10 +337,11 @@ def testing(n1):
     posts = get_db().get_posts_ids_by_author('jeff69420')
     print("These are posts", posts)
     if(len(posts['pids'])!=0):
-        firstpost = posts['pids'].split()[0]
-        print("this is firstpost", firstpost, "session: userid", session['user'])
-        get_db().create_comment(session['user'], firstpost, "this is a test commment")
+        firstpost = posts['pids'][0]
+        get_db().create_comment(get_db().get_user(session['user'])['user_id' ], firstpost, "Comment1")
+        get_db().create_comment(get_db().get_user(session['user'])['user_id' ], firstpost, "comment2")
         ret_comment = get_db().get_comment(get_db().get_user(session['user'])['user_id' ], firstpost)
+        
         return jsonify(ret_comment)
     else:
         print("no posts for author")
