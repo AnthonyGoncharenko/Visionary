@@ -135,8 +135,8 @@ class Database:
     def create_user(self, username, encrypted_password, email):
         self.__execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, encrypted_password, email])
 
-    def delete_user(self, username):
-        self.__execute('DELETE FROM users WHERE username=?', [username])
+    def delete_user(self, user_id):
+        self.__execute('DELETE FROM users WHERE uid=?', [user_id])
 
     def get_user(self, username):
         data = self.__select('SELECT * FROM users WHERE username=?', [username])
@@ -188,6 +188,9 @@ class Database:
             }
 
     def get_posts_from_author(self, author):
+        print(author)
+        if (author==None):
+            return {'posts':[]}
         post_ids = self.get_posts_ids_by_author(author)['pids']
         res = []
         for pid in post_ids:
@@ -221,9 +224,15 @@ class Database:
         posts = self.__select('SELECT * FROM posts ORDER BY clicks DESC LIMIT ?', [n])
 
         res = []
+        if posts == None:
+            return {'posts' : res}
         for post in posts:
+            print(posts)
             v = post_to_dict(post)
-            v["author"] = self.get_user_by_uid(v["uid"])['username']
+            if (self.get_user_by_uid(v["uid"])):
+                v["author"] = self.get_user_by_uid(v["uid"])['username']
+            else:
+                v["author"] = "Deleted_Account"
             v["img_path"] = self.get_img(v['imid'])['img']
 
             res.append(v)
@@ -238,7 +247,10 @@ class Database:
         res = []
         for post in posts:
             v = post_to_dict(post)
-            v["author"] = self.get_user_by_uid(v["uid"])['username']
+            if (self.get_user_by_uid(v["uid"])):
+                v["author"] = self.get_user_by_uid(v["uid"])['username']
+            else:
+                v["author"] = "Deleted_Account"
             v["img_path"] = self.get_img(v['imid'])['img']
         
             res.append(v)
@@ -267,7 +279,10 @@ class Database:
         res = []
         for post in posts:
             v = post_to_dict(post)
-            v["author"] = self.get_user_by_uid(v["uid"])['username']
+            if (self.get_user_by_uid(v["uid"])):
+                v["author"] = self.get_user_by_uid(v["uid"])['username']
+            else:
+                v["author"] = "Deleted_Account"
             v["img_path"] = self.get_img(v['imid'])['img']
 
             res.append(v)
@@ -293,6 +308,9 @@ class Database:
                 self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
 
     def create_comment(self, uid, pid, content):
+        print(uid)
+        print(pid)
+        print(content)
         self.__execute("INSERT INTO comments (uid, pid, content) VALUES (?, ?, ?)", [uid, pid, content])
 
     def get_comments(self, pid):
@@ -301,7 +319,10 @@ class Database:
         res = []
         for comment in comments:
             v = comment_to_dict(comment)
-            v['username'] = self.get_user_by_uid(v["user_id"])["username"]
+            if (self.get_user_by_uid(v["user_id"])):
+                v["author"] = self.get_user_by_uid(v["user_id"])['username']
+            else:
+                v["author"] = "Deleted_Account"
             res.append(v)
 
         return {

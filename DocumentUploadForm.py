@@ -6,6 +6,6 @@ from flask_wtf.file import FileRequired, FileAllowed, FileField
 
 class DocumentUploadForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
-    file = MultipleFileField('Images', validators=[FileAllowed(['tiff', 'svs', 'jpg', 'jpeg', 'png'], 'Whole Slide Image Data Only!')])
+    file = MultipleFileField('Images', validators=[FileAllowed(['tiff', 'svs', 'jpg', 'jpeg', 'png'], 'Image files only.')])
     submit = SubmitField('Submit Images')
 
