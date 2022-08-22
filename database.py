@@ -295,10 +295,30 @@ class Database:
     def create_comment(self, uid, pid, content):
         self.__execute("INSERT INTO comments (uid, pid, content) VALUES (?, ?, ?)", [uid, pid, content])
 
-    def get_comment(self, uid,pid):
-        data = self.__select('SELECT * FROM comments WHERE uid=? and  pid=?', [uid,pid])
+    def get_comments(self, pid):
+        comments = self.__select('SELECT * FROM comments WHERE pid=?', [pid])
+
+        res = []
+        for comment in comments:
+            v = comment_to_dict(comment)
+            v['username'] = self.get_user_by_uid(v["user_id"])["username"]
+            res.append(v)
+
         return {
-            'comments' : [comment_to_dict(comment) for comment in data]
+            'comments' : res
+        }
+
+    def get_comment(self, uid,pid):
+        comments = self.__select('SELECT * FROM comments WHERE uid=? and  pid=?', [uid,pid])
+
+        res = []
+        for comment in comments:
+            v = comment_to_dict(comment)
+            v['username'] = self.get_user_by_uid(v["user_id"])["username"]
+            res.append(v)
+
+        return {
+            'comments' : res
         }
         
 

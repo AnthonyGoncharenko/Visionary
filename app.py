@@ -141,7 +141,6 @@ def handle_image(request, user):
 #                          End Image Upload Helper functions
 ########################################################################
 
-#{{ imageField(form.post_image, accept=".png,.jpg", autocomplete="off") }}
 
 ########################################################################
 #                           MAKE POST PAGE
@@ -173,11 +172,13 @@ def make_post_page():
 ########################################################################
 @app.route('/view_post', methods=['GET'])
 def view_post_page():
+    pid = request.args.get('post_id')
     return render_template("ViewPost.html",
         session=session,
-        post = get_db().get_post_by_id(request.args.get('post_id'))['posts'][0],
-        canDelete=canDelete(request.args.get('post_id')),
-        form=CommentForm())
+        post = get_db().get_post_by_id(pid)['posts'][0],
+        canDelete=canDelete(pid),
+        form=CommentForm(),
+        comments=get_db().get_comments(pid))
 
 ########################################################################
 #                         END VIEW POST PAGE
@@ -255,6 +256,26 @@ def followed_authors_page():
 #                         END FOLLOWED AUTHORS PAGE
 ########################################################################
 
+
+########################################################################
+#                           FIND AUTHOR
+########################################################################
+@app.route('/find_authors', methods=['POST'])
+def find_authors():
+    if 'user' in session:
+        if 'author_name' in request.form:
+            if (user := get_db().get_user(request.form['author_name'])) is not None:
+                uid = user["user_id"]
+                return redirect(url_for("profile_page", uid=uid))
+    else:
+        return redirect(url_for('home_page'))
+########################################################################
+#                         END FIND AUTHOR
+########################################################################
+
+
+
+
 ########################################################################
 #                           MAKE COMMENT PAGE
 ########################################################################
@@ -262,11 +283,13 @@ def followed_authors_page():
 def make_comment_page():
     if 'user' in session:
         if request.method == 'POST':
-            if request.form.validate_on_submit():
-                if 'pid' in request.args:
-                    pid = request.args['pid']
-                    get_db().create_comment(session['user']['uid'], request.args.get('post_id'), request.form['comment_content'])
-
+            if 'comment_content' in request.form:
+                print(request.form['comment_content'])
+                if 'post_id' in request.args:
+                    print(request.args['post_id'])
+                    get_db().create_comment(session['user_details']['user_id'], request.args['post_id'], request.form['comment_content'])
+                    redirect(request.referrer)
+    return redirect(url_for('home_page'))
 ########################################################################
 #                         END MAKE COMMENT PAGE
 ########################################################################
@@ -280,16 +303,15 @@ def make_comment_page():
 def profile_page():
     if request.method == 'GET':
         db = get_db()
-
-        if 'uid' in request.args:
-            user = db.get_user_by_uid(request.args['uid'])
-            posts=db.get_posts_from_author(user['username']['posts'])
-            return render_template("Profile.html", user=user, session=session, posts=posts)
-
-        elif 'user' in session:
+        if 'user' in session:
             session['user_details'] = db.get_user(session['user'])
-            posts = db.get_posts_from_author(session['user'])['posts']
-            user = db.get_user_by_uid(session['user_details']['user_id'])
+            if 'uid' in request.args:
+                user = db.get_user_by_uid(request.args['uid'])
+                posts=db.get_posts_from_author(user['username'])['posts']
+            else:
+                user = db.get_user_by_uid(session['user_details']['user_id'])
+                posts=db.get_posts_from_author(user['username'])['posts']
+
             return render_template(
                 "Profile.html", 
                 user=user, 
@@ -297,8 +319,9 @@ def profile_page():
                 posts=posts, 
                 followed=get_followed(),
                 form=AuthorForm())
-        else:
-            return redirect(url_for('sign_in_page'))
+
+    else:
+        return redirect(url_for('sign_in_page'))
 
 ########################################################################
 #                         END PROFILE PAGE
