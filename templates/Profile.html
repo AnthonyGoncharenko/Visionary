@@ -24,12 +24,14 @@
           </div>
         </div>
         <div class="col">
-          {% if user.username == session['user'] %}
-            <button type="submit" class="btn" style="background-color: red; color: white;">Delete Your Account</button>
-          {% elif user.username in session['user'].followed %}
-            <button type="submit" class="btn" style="background-color: darkorange; color: white;">Unfollow this User</button>
-          {% else %}
-            <button type="submit" class="btn" style="background-color: darkmagenta; color: white;">Follow this User</button>
+          {% if 'user' in session %}
+            {% if user.username == session['user'] %}
+              <button type="submit" class="btn" style="background-color: red; color: white;">Delete Your Account</button>
+            {% elif user.username in session['user'].followed %}
+              <button type="submit" class="btn" style="background-color: darkorange; color: white;">Unfollow this User</button>
+            {% else %}
+              <button type="submit" class="btn" style="background-color: darkmagenta; color: white;">Follow this User</button>
+            {% endif %}
           {% endif %}
         </div>
       </div>

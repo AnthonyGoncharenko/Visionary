@@ -162,7 +162,7 @@ def make_post_page():
             session['user_details'] =  get_db().get_user(user)
             return render_template("MakePost.html", session=session, form=form, trending_posts=trending_posts())
     else:
-        flash("SIGN IN FIRST BEFORE MAKING A POST!!")
+        flash("LogIn before you make a post.")
         return redirect(url_for('sign_in_page'))
 ########################################################################
 #                         END MAKE POST PAGE
@@ -443,7 +443,6 @@ def canDelete(pid):
     if 'user' in session:
         print(session)
         if post := db.get_post_by_id(pid)['posts'][0]:
-            print(post)
             if (user := db.get_user_by_uid(post["uid"])) is not None:
                 if user['username'] == session['user']:
                     return True
