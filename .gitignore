@@ -136,3 +136,4 @@ dmypy.json
 uploads/
 
 .DS_Store
+static/uploads
