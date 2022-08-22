@@ -123,6 +123,10 @@
     background-color: palevioletred;
 }
 
+.author-blog-backing {
+    background-color: goldenrod;
+}
+
 .gold-menu {
     border-color: darkgoldenrod!important; 
     background-color: palegoldenrod;

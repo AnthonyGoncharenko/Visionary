@@ -1,25 +1,53 @@
 {% from "form_helper.html" import commentTextField, displayField %}
+
 {% macro postfeed(posts) %}
-  <div class="px-5 overflow-auto container crimson-background h-100"">
-    {% for post_info in posts %}{{ post(post_info) }}{% endfor %}
+  <div class="p-0 overflow-auto container-fluid crimson-background row m-0 h-100">
+    {% for post_info in posts %}
+      {{ post(post_info) }}
+    {% endfor %}
   </div>
 {% endmacro %}
+
 {% macro author_postfeed(author_posts) %}
-  <div class="px-5 overflow-auto container orange-background h-100"">
-    {% for post_info in author_posts %}{{ post(post_info) }}{% endfor %}
+  <div class="p-0 overflow-auto container-fluid orange-background row m-0 h-100">
+    {% for post_info in posts %}
+      {{ author_post(post_info) }}
+    {% endfor %}
   </div>
 {% endmacro %}
+
 {% macro post(post_info) %}
-  <div class="p-5 m-5 blog-backing">
-    <div class="mb-3 d-flex justify-content-center">
-      <img id="PostImage" src="{{ post_info.img_path }}">
+    <div class="col-6 m-0 mb-5 h-50">
+      <a class="m-0 p-0" href="view_post?post_id={{ post_info.pid }}" style="color: inherit; text-decoration: inherit;">
+        <div class="p-4  pt-2 m-5 blog-backing border shadow-sm border-3 border-dark h-100" style="border-radius: 45px">
+          <h1 class="p-3 pt-0 text-wrap text-break text-center" style="height: 15%">{{ post_info.title }}</h1>
+          <div class="mb-3 d-flex justify-content-center" style="height: 70%">
+            <img class="h-100 mx-auto img-fluid" src="{{ post_info.img_path }}">
+          </div>
+          <div class="overflow-hidden" style="height: 15%">
+            <p class="text-wrap text-break montserrat h-100" style="font-size: 12pt;">{{ post_info.content }}</p>
+          </div>
+        </div>
+      </a>
     </div>
-    <div>
-      <h2 id="PostHeader" class="text-wrap text-break">{{ post_info.title }}</h2>
-      <p class="text-wrap text-break montserrat">{{ post_info.content }}</p>
-    </div>
-  </div>
 {% endmacro %}
+
+{% macro author_post(post_info) %}
+    <div class="col-6 m-0 mb-5 h-50">
+      <a class="m-0 p-0" href="view_post?post_id={{ post_info.pid }}" style="color: inherit; text-decoration: inherit;">
+        <div class="p-4  pt-2 m-5 author-blog-backing border shadow-sm border-3 border-dark h-100" style="border-radius: 45px">
+          <h1 class="p-3 pt-0 text-wrap text-break text-center" style="height: 15%">{{ post_info.title }}</h1>
+          <div class="mb-3 d-flex justify-content-center" style="height: 70%">
+            <img class="h-100 mx-auto img-fluid" src="{{ post_info.img_path }}">
+          </div>
+          <div class="overflow-hidden" style="height: 15%">
+            <p class="text-wrap text-break montserrat h-100" style="font-size: 12pt;">{{ post_info.content }}</p>
+          </div>
+        </div>
+      </a>
+    </div>
+{% endmacro %}
+
 {% macro postRail(posts) %}
   <div class="col p-0 sticky-top h-100">
     <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
@@ -33,6 +61,7 @@
     </div>
   </div>
 {% endmacro %}
+
 {% macro authorsTab(authors, form) %}
   <div class="col p-0 sticky-top h-100">
     <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
@@ -55,7 +84,8 @@
     </div>
   </div>
 {% endmacro %}
-{% macro commentSection(comments, form, post_id) %}
+
+{% macro commentSection(comments, form) %}
   <div class="col p-0 sticky-top h-100">
     <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
       <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5"
@@ -77,15 +107,17 @@
     </div>
   </div>
 {% endmacro %}
+
 {% macro minipost(post) %}
   <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
     <div class="d-flex w-100 align-items-center justify-content-between">
       <strong class="mb-1">{{ post.title }}</strong>
-      <small class>{{ post.date }}</small>
+      <small class>{{ post.date[:10] }}</small>
     </div>
     <div class="col-4 mb-1 small">By {{ post.author }}</div>
   </a>
 {% endmacro %}
+
 {% macro author_info(author) %}
   <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
     <div class="d-flex w-100 align-items-center justify-content-center">
@@ -93,6 +125,7 @@
     </div>
   </a>
 {% endmacro %}
+
 {% macro comment(comment_info) %}
   <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
     <div class="col-4 mb-1 small">{{ comment_info.author }}</div>

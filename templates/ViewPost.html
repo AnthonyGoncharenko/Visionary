@@ -8,28 +8,31 @@
   {{ super() }}
 {% endblock head %}
 {% block content %}
-  <div class="row m-0 h-100">
-    <div class="col-8 p-0 crimson-background mb-auto h-100 overflow-auto">
-      <div class="p-5 container-fluid">
-        <div class="p-5 blog-backing">
-          <h1>{{ post.title }}</h1>
-          <h2>By {{ post.author }}</h2>
-          <small>{{ post.date }}</small>
-          <div class="mb-3 d-flex justify-content-center">
-            <img id="PostImage" src="post_info.image">
-          </div>
-          <div class="m-3 p-4" style="background-color: white;">
-            <p class="text-wrap text-break">{{ post.content }}</p>
-          </div>
+<div class="row m-0 h-100" >
+  <div class="col-8 p-0 crimson-background mb-auto h-100 overflow-auto">
+    <div class="p-5 container-fluid">
+      <div class="p-5 blog-backing">
+        <div class="row ">
+          <h1 class="mx-auto text-center text-wrap text-break display-1" style="font-family: 'Ubuntu', sans-serif; font-weight: bolder;"> {{ post.title }} </h1>
         </div>
-        {% if canDelete %}
-          <button type="submit"
-                  class="btn m-3"
-                  style="background-color: red;
-                         color: white;">Delete this Post</button>
-        {% endif %}
+        <div class="row">
+            <h2 class="mx-auto text-center text-wrap text-break"> By {{ post.author }} </h2>
+        </div>
+        <div class="row">
+            <h5 class="mx-auto text-center text-wrap text-break"> Published on {{ post.date[:10] }} </h5>
+        </div>
+        <div class="mt-3 mb-5 d-flex align-items-center h-25">
+          <img class="mx-auto img-fluid h-100" src="{{ post.img_path }}" >
+        </div>
+        <div class="m-3 p-4" style="background-color: white;">
+          <p class="text-wrap text-break montserrat" style="font-size: 18pt;"> {{ post.content }} </p>
+        </div>
       </div>
+      {% if canDelete %}
+        <button type="submit" class="btn m-3 border border-dark" style="background-color: red; color: white;">Delete this Post</button>
+      {% endif %}
     </div>
-    {{ commentSection(comments, form, post.pid) }}
   </div>
+  {{ commentSection(comments, form) }}
+</div>
 {% endblock content %}
