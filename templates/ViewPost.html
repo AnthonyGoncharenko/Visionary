@@ -1,7 +1,7 @@
 {% from 'macros/common_elements.jinja' import commentSection %}
 {% extends "base.html" %}
 {% block title %}
-  Make a Post
+  {{post.title}}
 {% endblock title %}
 {% set activePage = 0 %}
 {% block head %}
@@ -11,7 +11,7 @@
 <div class="row m-0 h-100" >
   <div class="col-8 p-0 crimson-background mb-auto h-100 overflow-auto">
     <div class="p-5 container-fluid">
-      <div class="p-5 blog-backing">
+      <div class="p-5 blog-backing border border-dark border-5" style="border-radius: 90px;">
         <div class="row ">
           <h1 class="mx-auto text-center text-wrap text-break display-1" style="font-family: 'Ubuntu', sans-serif; font-weight: bolder;"> {{ post.title }} </h1>
         </div>
@@ -28,11 +28,18 @@
           <p class="text-wrap text-break montserrat" style="font-size: 18pt;"> {{ post.content }} </p>
         </div>
       </div>
-      {% if canDelete %}
-        <button type="submit" class="btn m-3 border border-dark" style="background-color: red; color: white;">Delete this Post</button>
-      {% endif %}
+      <div class="row justify-content-center">
+        {% if canDelete %}
+          <button type="submit" 
+            onclick="location.href='/delete?pid={{ post.pid }}'" 
+            class="btn m-3 w-25 border border-dark montserrat" 
+            style="font-weight: bolder; background-color: white; color: red;">
+            Delete this Post
+          </button>
+        {% endif %}
+      </div>
     </div>
   </div>
-  {{ commentSection(comments, form) }}
+  {{ commentSection(comments['comments'], post.pid, form) }}
 </div>
 {% endblock content %}

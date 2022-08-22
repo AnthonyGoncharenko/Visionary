@@ -50,8 +50,7 @@ def home_page():
     else:
         n = 1
     return render_template("Home.html", 
-        session=session, 
-        followed_posts=followed_posts(), 
+        session=session,
         trending_posts=trending_posts(), 
         recent_posts=pagination(n))
 ########################################################################
@@ -70,7 +69,7 @@ def sign_in_page():
             password = request.form['password']
             print("CHECKING THE DATABASE FOR THE USER DATA...")
             if ((user := get_db().get_user(request.form['username'])) is None or not pbkdf2_sha256.verify(password, user['encrypted_password'])):
-                print('USERNAME OR PASSWORD DOES NOT MATCH')
+                flash("We don't have a username with that password.")
                 return render_template("SignIn.html", form=SignInForm(), error_messages = ['USER DOES NOT EXIST IN DATABASE'])
             print("REDIRECT TO THE HOME PAGE...")
             username = request.form['username']
@@ -97,7 +96,8 @@ def sign_up_page():
 
             if (response := get_db().get_user(request.form['username'])) is not None:
                 print('USER ALREADY EXISTS IN DATABASE...')
-                return render_template("SignUp.html", form=SignUpForm(), error_messages = ['USER ALREADY EXISTS IN DATABASE'])
+                flash("Username already taken.")
+                return render_template("SignUp.html", form=SignUpForm(), trending_posts=trending_posts())
 
             print("ADDING USER TO THE DATABASE...")
 
@@ -161,7 +161,7 @@ def make_post_page():
             session['user_details'] =  get_db().get_user(user)
             return render_template("MakePost.html", session=session, form=form, trending_posts=trending_posts())
     else:
-        flash("LogIn before you make a post.")
+        flash("Log-In before you make a post.")
         return redirect(url_for('sign_in_page'))
 ########################################################################
 #                         END MAKE POST PAGE
@@ -188,12 +188,33 @@ def view_post_page():
 #                         DELETE POST PAGE
 ########################################################################
 
-@app.route('/delete', methods=['POST'])
+@app.route('/delete', methods=['GET'])
 def delete_post():
     if 'pid' in request.args:
         pid = request.args['pid']
         delete_post(pid)
-        return redirect(url_for(request.referrer))
+        return redirect(url_for('home_page'))
+    return redirect(request.referrer)
+
+########################################################################
+#                       END DELETE POST PAGE
+########################################################################
+
+########################################################################
+#                         DELETE USER PAGE
+########################################################################
+
+@app.route('/delete_user', methods=['GET'])
+def delete_user():
+    if 'uid' in request.args:
+        uid = request.args['uid']
+        print(uid)
+        print(session['user_details']['user_id'])
+        if (int(uid) == int(session['user_details']['user_id'])):
+            print(uid)
+            get_db().delete_user(uid)
+            return redirect(url_for('home_page'))
+    return redirect(request.referrer)
 
 ########################################################################
 #                       END DELETE POST PAGE
@@ -208,7 +229,7 @@ def follow_author():
     if 'pid' in request.args:
         pid = request.args['pid']
         follow(pid)
-        return redirect(url_for(request.referrer))
+        return redirect(request.referrer)
 
 ########################################################################
 #                       END FOLLOW AN AUTHOR
@@ -221,8 +242,8 @@ def follow_author():
 @app.route('/unfollow_author', methods=['POST'])
 def unfollow_author():
     if 'pid' in request.args:
-        unfollow(requet.args['pid'])
-    return redirect(url_for(request.referrer))
+        unfollow(request.args['pid'])
+    return redirect(request.referrer)
 
 ########################################################################
 #                       END UNFOLLOW AN AUTHOR
@@ -274,8 +295,6 @@ def find_authors():
 ########################################################################
 
 
-
-
 ########################################################################
 #                           MAKE COMMENT PAGE
 ########################################################################
@@ -284,12 +303,11 @@ def make_comment_page():
     if 'user' in session:
         if request.method == 'POST':
             if 'comment_content' in request.form:
-                print(request.form['comment_content'])
                 if 'post_id' in request.args:
                     print(request.args['post_id'])
                     get_db().create_comment(session['user_details']['user_id'], request.args['post_id'], request.form['comment_content'])
                     redirect(request.referrer)
-    return redirect(url_for('home_page'))
+    return redirect(request.referrer)
 ########################################################################
 #                         END MAKE COMMENT PAGE
 ########################################################################
@@ -303,15 +321,16 @@ def make_comment_page():
 def profile_page():
     if request.method == 'GET':
         db = get_db()
-        if 'user' in session:
-            session['user_details'] = db.get_user(session['user'])
+        if 'uid' in request.args or 'user' in session:
             if 'uid' in request.args:
                 user = db.get_user_by_uid(request.args['uid'])
+                if (user == None):
+                    return redirect(url_for('home_page'))
                 posts=db.get_posts_from_author(user['username'])['posts']
-            else:
+            elif 'user' in session:
+                session['user_details'] = db.get_user(session['user'])
                 user = db.get_user_by_uid(session['user_details']['user_id'])
                 posts=db.get_posts_from_author(user['username'])['posts']
-
             return render_template(
                 "Profile.html", 
                 user=user, 
@@ -319,9 +338,8 @@ def profile_page():
                 posts=posts, 
                 followed=get_followed(),
                 form=AuthorForm())
-
-    else:
-        return redirect(url_for('sign_in_page'))
+        else:
+            return redirect(url_for('sign_in_page'))
 
 ########################################################################
 #                         END PROFILE PAGE
@@ -473,7 +491,7 @@ def canDelete(pid):
 
 def delete_post(pid):
     if canDelete(pid):
-        db.delete_post(pid)
+        get_db().delete_post(pid)
 
 def follow(pid):
     if 'user' in session:
@@ -495,10 +513,6 @@ def get_followed():
         return followed
     else:
         return []
-
-
-
-
 
 def get_followed_posts():
     return []
