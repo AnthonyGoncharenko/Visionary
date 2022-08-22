@@ -46,7 +46,7 @@
       </div>
       <div class="p-3 m-0 h-25 border-top border-5 border-dark"
            style="background-color: darkmagenta;">
-        <form class="p-2" method="post" action="make_comment">
+        <form class="p-2" method="post" action="find_authors">
           {{ form.csrf_token() }}
           {{ commentTextField(form.author_name, 'username', autocomplete="off") }}
           <button type="submit" class="btn" style="background-color: magenta;">Submit</button>
@@ -55,7 +55,7 @@
     </div>
   </div>
 {% endmacro %}
-{% macro commentSection(comments, form) %}
+{% macro commentSection(comments, form, post_id) %}
   <div class="col p-0 sticky-top h-100">
     <div class="h-100 d-flex flex-column align-items-stretch flex-shrink-0 border-start border-dark border-5">
       <div class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom border-dark border-5"
@@ -68,7 +68,7 @@
       </div>
       <div class="p-3 m-0 h-25 border-top border-5 border-dark"
            style="background-color: black;">
-        <form class="p-2" method="post" action="make_comment_page">
+        <form class="p-2" method="post" action="make_comment?post_id={{ post_id }}">
           {{ form.csrf_token() }}
           {{ commentTextField(form.comment_content, 'Let the author know what you think!', autocomplete="off") }}
           <button type="submit" class="btn" style="background-color: gold;">Submit</button>
