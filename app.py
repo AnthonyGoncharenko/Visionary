@@ -208,11 +208,10 @@ def delete_post():
 def delete_user():
     if 'uid' in request.args:
         uid = request.args['uid']
-        print(uid)
-        print(session['user_details']['user_id'])
         if (int(uid) == int(session['user_details']['user_id'])):
-            print(uid)
             get_db().delete_user(uid)
+            session.pop('user', None)
+            session.pop('user_details', None)
             return redirect(url_for('home_page'))
     return redirect(request.referrer)
 
@@ -224,11 +223,12 @@ def delete_user():
 #                         FOLLOW AN AUTHOR
 ########################################################################
 
-@app.route('/follow_author/', methods=['POST'])
+@app.route('/follow_author', methods=['GET'])
 def follow_author():
-    if 'pid' in request.args:
-        pid = request.args['pid']
-        follow(pid)
+    print("hello")
+    if 'uid' in request.args:
+        uid = request.args['uid']
+        follow(uid)
         return redirect(request.referrer)
 
 ########################################################################
@@ -239,10 +239,10 @@ def follow_author():
 #                         UNFOLLOW AN AUTHOR
 ########################################################################
 
-@app.route('/unfollow_author', methods=['POST'])
+@app.route('/unfollow_author', methods=['GET'])
 def unfollow_author():
-    if 'pid' in request.args:
-        unfollow(request.args['pid'])
+    if 'uid' in request.args:
+        unfollow(request.args['uid'])
     return redirect(request.referrer)
 
 ########################################################################
@@ -255,7 +255,21 @@ def unfollow_author():
 @app.route('/authors', methods=['GET', 'POST'])
 def authors_page():
     form = AuthorForm()
-    return render_template("FindAuthors.html", form=form)
+    if 'user' in session:
+        db = get_db();
+        session['user_details'] = db.get_user(session['user'])
+        user = db.get_user_by_uid(session['user_details']['user_id'])
+        posts=db.get_n_followed_posts(user['username'],10)['posts']
+        print(posts)
+        return render_template("FindAuthors.html",
+            user=user, 
+            session=session, 
+            posts=posts, 
+            followed=get_followed(),
+            form=AuthorForm())
+    else:
+        flash("You need an account to follow authors.")
+        return redirect(url_for('sign_in_page'))
 ########################################################################
 #                        END FIND AUTHORS PAGE
 ########################################################################
@@ -304,7 +318,6 @@ def make_comment_page():
         if request.method == 'POST':
             if 'comment_content' in request.form:
                 if 'post_id' in request.args:
-                    print(request.args['post_id'])
                     get_db().create_comment(session['user_details']['user_id'], request.args['post_id'], request.form['comment_content'])
                     redirect(request.referrer)
     return redirect(request.referrer)
@@ -482,7 +495,6 @@ def followed_posts():
 def canDelete(pid):
     db = get_db()
     if 'user' in session:
-        print(session)
         if post := db.get_post_by_id(pid)['posts'][0]:
             if (user := db.get_user_by_uid(post["uid"])) is not None:
                 if user['username'] == session['user']:
@@ -497,19 +509,21 @@ def follow(pid):
     if 'user' in session:
         db = get_db()
         uid = db.get_user(session['user'])["user_id"]
+        print(pid, uid)
         db.follow(uid, pid)
 
 def unfollow(pid):
     if 'user' in session:
         db = get_db()
         uid = db.get_user(session['user'])["user_id"]
+        print(pid, uid)
         db.unfollow(uid, pid)
 def get_followed():
     if 'user' in session:
         db = get_db()
         session['user_details'] = db.get_user(session['user'])
         followed = session['user_details']['followed']
-        followed = [db.get_user_by_uid(int(follow)) for follow in followed if follower != ""]
+        followed = [db.get_user_by_uid(int(follow)) for follow in followed if follow != ""]
         return followed
     else:
         return []

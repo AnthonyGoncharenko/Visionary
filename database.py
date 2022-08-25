@@ -294,6 +294,8 @@ class Database:
     def follow(self, uid, pid):
         if (user := self.get_user_by_uid(uid)) is not None:
             followed = user["followed"]
+            print("user",user)
+            print("followed",followed)
             if pid not in (s := set(followed)):
                 s.add(pid)
                 new_followed = " ".join(list(map(str, s)))
@@ -302,8 +304,15 @@ class Database:
     def unfollow(self, uid, pid):
         if (user := self.get_user_by_uid(uid)) is not None:
             followed = user["followed"]
-            if pid in (s := set(followed)):
-                s.remove(pid)
+            print("user",user)
+            print("followed",followed)
+            s = list(followed)
+            print(s)
+            print(pid)
+            print(pid in s)
+            if int(pid) in (s):
+                print("hello")
+                s.remove(int(pid))
                 new_followed = " ".join(list(map(str, s)))
                 self.__execute("UPDATE users SET followed=? WHERE uid=?", [new_followed, uid])
 

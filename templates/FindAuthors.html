@@ -11,9 +11,9 @@
 {% endblock head %}
 {% block content %}
   <div class="row m-0 h-100">
-    <div class="col-8 p-0">
-      {{ author_postfeed() }}
+    <div class="col-8 p-0 h-100">
+      {{ author_postfeed(posts) }}
     </div>
-    {{ authorsTab(authors, form) }}
+    {{ authorsTab(followed, form) }}
   </div>
 {% endblock content %}

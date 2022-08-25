@@ -29,11 +29,11 @@
         <div class="col">
           {% if 'user' in session %}
             {% if user.username == session['user'] %}
-              <button type="submit" onclick="location.href='/delete_user?uid={{ uid }}'" class="btn" style="background-color: red; color: white;">Delete Your Account</button>
-            {% elif user.username in session['user'].followed %}
-              <button type="submit" onclick="" class="btn" style="background-color: darkorange; color: white;">Unfollow this User</button>
+              <button type="submit" onclick="location.href='/delete_user?uid={{ user.user_id }}'" class="btn" style="background-color: red; color: white;">Delete Your Account</button>
+            {% elif user.user_id in session['user_details']['followed'] %}
+              <button type="submit" onclick="location.href='/unfollow_author?uid={{ user.user_id }}'" class="btn" style="background-color: darkorange; color: white;">Unfollow this User</button>
             {% else %}
-              <button type="submit" onclick="" class="btn" style="background-color: darkmagenta; color: white;">Follow this User</button>
+              <button type="submit" onclick="location.href='/follow_author?uid={{ user.user_id }}'" class="btn" style="background-color: darkmagenta; color: white;">Follow this User</button>
             {% endif %}
           {% endif %}
         </div>
