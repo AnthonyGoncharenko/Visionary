@@ -10,7 +10,7 @@
 
 {% macro author_postfeed(author_posts) %}
   <div class="p-0 overflow-auto container-fluid orange-background row m-0 h-100">
-    {% for post_info in posts %}
+    {% for post_info in author_posts %}
       {{ author_post(post_info) }}
     {% endfor %}
   </div>
@@ -125,7 +125,7 @@
 {% endmacro %}
 
 {% macro author_info(author) %}
-  <a href="#" class="list-group-item list-group-item-action p-3 pe-4">
+  <a href="/profile?uid={{ author.user_id }}" class="list-group-item list-group-item-action p-3 pe-4">
     <div class="d-flex w-100 align-items-center justify-content-center">
       <strong class="mb-1">{{ author.username }}</strong>
     </div>
